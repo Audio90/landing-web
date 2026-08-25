@@ -118,6 +118,86 @@ const howSteps = [
   },
 ];
 
+const intentDistribution = [
+  { rating: "1", label: "Very unlikely", value: 3, color: "var(--accent)" },
+  { rating: "2", label: "Unlikely", value: 9, color: "var(--accent)" },
+  { rating: "3", label: "Undecided", value: 29, color: "var(--warning)" },
+  { rating: "4", label: "Likely", value: 43, color: "var(--primary)" },
+  { rating: "5", label: "Very likely", value: 16, color: "var(--primary)" },
+];
+
+const uncertaintyPrinciples = [
+  {
+    number: "01",
+    title: "Disagreement is information",
+    description:
+      "Segment splits and conflicting reactions stay visible instead of being averaged into a confident-looking answer.",
+  },
+  {
+    number: "02",
+    title: "Confidence is earned",
+    description:
+      "A prediction carries an explicit confidence level that can later be checked against actual campaign outcomes.",
+  },
+  {
+    number: "03",
+    title: "Evidence keeps its label",
+    description:
+      "Observations, associations, hypotheses and validated experiments are kept separate throughout the analysis.",
+  },
+];
+
+const campaignComparison = [
+  {
+    label: "Creative direction",
+    predicted: "Creative B",
+    observed: "Creative B",
+    result: "Aligned",
+    color: "var(--success)",
+  },
+  {
+    label: "Engagement lift",
+    predicted: "+18.0%",
+    observed: "+12.4%",
+    result: "−5.6 pts",
+    color: "var(--warning)",
+  },
+  {
+    label: "Skip reduction",
+    predicted: "−14.0%",
+    observed: "−9.6%",
+    result: "+4.4 pts",
+    color: "var(--warning)",
+  },
+];
+
+const learningLoop = [
+  {
+    number: "01",
+    title: "Predict",
+    description: "Record the hypothesis, distribution and confidence before launch.",
+    color: "var(--primary)",
+  },
+  {
+    number: "02",
+    title: "Observe",
+    description: "Normalize aggregated outcomes from the live campaign.",
+    color: "var(--accent)",
+  },
+  {
+    number: "03",
+    title: "Measure error",
+    description: "Compare direction, magnitude and confidence with reality.",
+    color: "var(--warning)",
+  },
+  {
+    number: "04",
+    title: "Calibrate",
+    description: "Update the next experiment without rewriting the evidence.",
+    color: "var(--success)",
+  },
+];
+
 const experimentInputs = [
   {
     type: "audience",
@@ -1207,6 +1287,472 @@ function Home() {
                   </div>
                 </article>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden border-t border-border bg-bg" id="research">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 opacity-30"
+            style={{
+              backgroundImage:
+                "linear-gradient(color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 40%, transparent) 1px, transparent 1px)",
+              backgroundSize: "72px 72px",
+              maskImage:
+                "linear-gradient(to bottom, transparent, black 14%, black 86%, transparent)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -right-50 top-10 -z-10 size-150 rounded-full opacity-18 blur-3xl"
+            style={{ background: "radial-gradient(circle, var(--accent), transparent 65%)" }}
+          />
+
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-30 lg:px-12 lg:py-36">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-18">
+              <div className="scroll-reveal lg:col-span-7">
+                <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-primary">
+                  Synthetic Audience Lab
+                </p>
+                <h2 className="mt-6 max-w-210 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                  We model distributions, not fake certainty.
+                </h2>
+              </div>
+              <div className="scroll-reveal lg:col-span-5">
+                <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  A single AI score hides how people disagree. Audio 90 keeps the
+                  response distribution visible, preserves natural-language context
+                  and labels every estimate for what it is.
+                </p>
+                <div className="mt-6 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+                  <span className="size-2 rounded-full bg-warning" />
+                  Illustrative synthetic output
+                </div>
+              </div>
+            </div>
+
+            <div className="research-workbench mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-surface shadow-2xl shadow-black/8 lg:grid lg:grid-cols-12">
+              <div className="relative overflow-hidden bg-primary p-6 text-on-primary sm:p-8 lg:col-span-5 lg:p-10">
+                <div
+                  aria-hidden="true"
+                  className="absolute -left-24 -top-24 size-70 rounded-full border border-on-primary/15"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute -left-12 -top-12 size-48 rounded-full border border-dashed border-on-primary/20"
+                />
+
+                <div className="relative flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-primary/65">
+                      Synthetic participant · P-041
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold">Natural-language reaction</h3>
+                  </div>
+                  <span className="rounded-full border border-on-primary/20 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-on-primary/75">
+                    Elicited
+                  </span>
+                </div>
+
+                <div className="relative mt-8 rounded-2xl border border-on-primary/20 bg-on-primary/7 p-5 sm:p-6">
+                  <span className="text-4xl leading-none text-on-primary/35">“</span>
+                  <blockquote className="-mt-2 text-xl leading-8 tracking-[-0.02em] sm:text-2xl sm:leading-9">
+                    I might try it because the offer sounds useful, but I would need a
+                    clearer price reason before switching.
+                  </blockquote>
+                  <div className="mt-7 flex flex-wrap gap-2">
+                    {["Offer understood", "Moderate intent", "Price objection"].map((item) => (
+                      <span className="rounded-full border border-on-primary/18 bg-on-primary/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.1em] text-on-primary/75" key={item}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative mt-8 grid grid-cols-2 gap-3">
+                  <div className="rounded-xl border border-on-primary/15 p-4">
+                    <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-on-primary/55">Audience</p>
+                    <p className="mt-2 text-sm font-medium">Mumbai · 18–30</p>
+                  </div>
+                  <div className="rounded-xl border border-on-primary/15 p-4">
+                    <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-on-primary/55">Question</p>
+                    <p className="mt-2 text-sm font-medium">Purchase intent</p>
+                  </div>
+                </div>
+
+                <p className="relative mt-8 border-l border-on-primary/35 pl-4 text-sm leading-6 text-on-primary/68">
+                  Participants answer naturally before the system maps meaning to an
+                  ordered response distribution.
+                </p>
+              </div>
+
+              <div className="p-6 sm:p-8 lg:col-span-7 lg:p-10">
+                <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">
+                      Semantic Similarity Rating
+                    </p>
+                    <h3 className="mt-2 text-2xl font-semibold sm:text-3xl">Purchase intent distribution</h3>
+                  </div>
+                  <span className="self-start rounded-full bg-surface-light px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
+                    SSR · illustrative
+                  </span>
+                </div>
+
+                <div className="mt-7 grid grid-cols-3 gap-2 text-center sm:gap-3">
+                  {[
+                    ["01", "Ask naturally"],
+                    ["02", "Map meaning"],
+                    ["03", "Keep uncertainty"],
+                  ].map(([number, label]) => (
+                    <div className="rounded-xl bg-bg px-2 py-3 sm:px-4" key={number}>
+                      <p className="font-mono text-[8px] text-primary">{number}</p>
+                      <p className="mt-1 text-[10px] font-medium sm:text-xs">{label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 rounded-2xl border border-border bg-bg/60 p-4 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Probability mass by response</p>
+                    <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">n = synthetic panel</p>
+                  </div>
+
+                  <div className="mt-8 flex h-58 items-end justify-between gap-2 sm:gap-4">
+                    {intentDistribution.map((item, index) => (
+                      <div className="flex min-w-0 flex-1 flex-col items-center" key={item.rating}>
+                        <span className="mb-2 font-mono text-[9px] text-muted">{item.value}%</span>
+                        <span
+                          className="uncertainty-bar block w-full max-w-14 rounded-t-lg"
+                          style={{
+                            "--bar-delay": `${index * 110}ms`,
+                            backgroundColor: item.color,
+                            height: `${Math.max(14, item.value * 4)}px`,
+                            opacity: 0.88,
+                          }}
+                        />
+                        <span className="mt-3 grid size-7 place-items-center rounded-full border border-border bg-surface font-mono text-[9px]">
+                          {item.rating}
+                        </span>
+                        <span className="mt-2 hidden text-center text-[9px] leading-4 text-muted sm:block">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-primary/25 bg-primary/6 p-4">
+                    <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-primary">Expected rating</p>
+                    <div className="mt-2 flex items-end justify-between gap-4">
+                      <p className="text-3xl font-semibold">3.53</p>
+                      <p className="pb-1 text-xs text-muted">Likely, with hesitation</p>
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-warning/25 bg-warning/6 p-4">
+                    <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-warning">Uncertainty retained</p>
+                    <div className="mt-3 flex items-center gap-1">
+                      {intentDistribution.map((item) => (
+                        <span
+                          className="h-2 rounded-full"
+                          key={item.rating}
+                          style={{ backgroundColor: item.color, flex: item.value }}
+                        />
+                      ))}
+                    </div>
+                    <p className="mt-2 text-xs text-muted">Five outcomes remain represented</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 grid overflow-hidden rounded-2xl border border-border bg-surface lg:grid-cols-3">
+              {uncertaintyPrinciples.map((item, index) => (
+                <article
+                  className="research-principle scroll-reveal p-6 not-last:border-b not-last:border-border lg:p-8 lg:not-last:border-b-0 lg:not-last:border-r"
+                  key={item.number}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[9px] text-primary">{item.number}</span>
+                    <span className="size-2 rounded-full" style={{ backgroundColor: ["var(--accent)", "var(--warning)", "var(--primary)"][index] }} />
+                  </div>
+                  <h3 className="mt-8 text-xl font-semibold">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-6 text-muted">{item.description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="scroll-reveal mx-auto mt-10 flex max-w-250 items-start gap-4 rounded-2xl border border-primary/25 bg-primary/6 p-5 sm:p-6">
+              <span className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-primary/30 font-mono text-xs text-primary">i</span>
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-primary">Scientific humility</p>
+                <p className="mt-2 text-sm leading-6 text-muted sm:text-base sm:leading-7">
+                  Synthetic feedback is a pre-market signal, not ground truth. Audio 90
+                  measures when the simulator is wrong and uses real campaign outcomes
+                  to improve the next prediction.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="relative isolate overflow-hidden border-t border-border bg-surface"
+          id="learning-loop"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 -z-20 h-115 opacity-55"
+            style={{
+              background:
+                "linear-gradient(135deg, color-mix(in srgb, var(--primary) 10%, transparent), transparent 52%), radial-gradient(circle at 82% 20%, color-mix(in srgb, var(--warning) 13%, transparent), transparent 34%)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute left-1/2 top-36 -z-10 h-px w-[90%] max-w-330 -translate-x-1/2 bg-border"
+          />
+
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-30 lg:px-12 lg:py-36">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-18">
+              <div className="scroll-reveal lg:col-span-7">
+                <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-accent">
+                  Real-campaign feedback
+                </p>
+                <h2 className="mt-6 max-w-220 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                  Prediction only becomes useful when reality can disagree.
+                </h2>
+              </div>
+              <div className="scroll-reveal lg:col-span-5">
+                <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  After launch, Audio 90 compares the pre-market hypothesis with
+                  normalized campaign outcomes. Correct calls, misses and confidence
+                  gaps all become evidence for the next experiment.
+                </p>
+                <div className="mt-6 flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+                  <span className="size-2 rounded-full bg-accent" />
+                  Illustrative campaign record
+                </div>
+              </div>
+            </div>
+
+            <div className="feedback-console mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-bg shadow-2xl shadow-black/8">
+              <div className="flex flex-col gap-4 border-b border-border bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+                <div className="flex items-center gap-4">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-on-primary">
+                    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 20 20">
+                      <path d="M3 15.5V11l4 1.5V8l4 1.5V4l6 2.3v9.2H3Z" stroke="currentColor" strokeLinejoin="round" strokeWidth="1.5" />
+                      <path d="m5 6.5 2-2 2 1 3-3" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
+                      Learning event · CAM-042
+                    </p>
+                    <h3 className="mt-1 text-lg font-semibold sm:text-xl">
+                      Mumbai acquisition campaign
+                    </h3>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-border px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
+                    Spotify · 14 days
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-success">
+                    <span className="size-1.5 rounded-full bg-success" />
+                    Outcome received
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-12">
+                <div className="border-b border-border p-5 sm:p-8 lg:col-span-7 lg:border-b-0 lg:border-r lg:p-10">
+                  <div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2 sm:gap-4">
+                    <div className="rounded-2xl border border-primary/25 bg-primary/6 p-4 sm:p-6">
+                      <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-primary">
+                        Before launch
+                      </p>
+                      <p className="mt-5 text-2xl font-semibold sm:text-3xl">B · 67%</p>
+                      <p className="mt-2 text-xs leading-5 text-muted sm:text-sm">
+                        Synthetic preference
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="h-full w-px bg-border" />
+                      <span className="feedback-transfer grid size-9 shrink-0 place-items-center rounded-full border border-border bg-surface text-primary shadow-sm">
+                        <ArrowIcon />
+                      </span>
+                      <span className="h-full w-px bg-border" />
+                    </div>
+
+                    <div className="rounded-2xl border border-success/25 bg-success/7 p-4 sm:p-6">
+                      <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-success">
+                        After launch
+                      </p>
+                      <p className="mt-5 text-2xl font-semibold sm:text-3xl">B · +12.4%</p>
+                      <p className="mt-2 text-xs leading-5 text-muted sm:text-sm">
+                        Observed engagement lift
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex items-end justify-between gap-5">
+                    <div>
+                      <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-primary">
+                        Prediction versus reality
+                      </p>
+                      <h3 className="mt-2 text-xl font-semibold sm:text-2xl">
+                        Direction correct. Magnitude overstated.
+                      </h3>
+                    </div>
+                    <span className="hidden rounded-full border border-warning/30 bg-warning/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-warning sm:block">
+                      Calibration needed
+                    </span>
+                  </div>
+
+                  <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-surface">
+                    <div className="grid grid-cols-[1.3fr_.8fr_.8fr_.7fr] gap-2 border-b border-border bg-surface-light/60 px-4 py-3 font-mono text-[8px] uppercase tracking-[0.1em] text-muted sm:px-5">
+                      <span>Signal</span>
+                      <span>Predicted</span>
+                      <span>Observed</span>
+                      <span className="text-right">Residual</span>
+                    </div>
+                    {campaignComparison.map((item) => (
+                      <div
+                        className="campaign-row grid grid-cols-[1.3fr_.8fr_.8fr_.7fr] items-center gap-2 border-b border-border px-4 py-4 last:border-b-0 sm:px-5"
+                        key={item.label}
+                      >
+                        <span className="text-xs font-medium sm:text-sm">{item.label}</span>
+                        <span className="font-mono text-[9px] text-muted sm:text-[10px]">{item.predicted}</span>
+                        <span className="font-mono text-[9px] text-muted sm:text-[10px]">{item.observed}</span>
+                        <span className="text-right font-mono text-[9px] font-semibold sm:text-[10px]" style={{ color: item.color }}>
+                          {item.result}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <aside className="relative overflow-hidden bg-primary p-6 text-on-primary sm:p-8 lg:col-span-5 lg:p-10">
+                  <div
+                    aria-hidden="true"
+                    className="absolute -right-28 -top-28 size-80 rounded-full border border-on-primary/12"
+                  />
+                  <div
+                    aria-hidden="true"
+                    className="absolute -right-14 -top-14 size-52 rounded-full border border-dashed border-on-primary/18"
+                  />
+
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div>
+                      <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-on-primary/60">
+                        Error ledger
+                      </p>
+                      <h3 className="mt-2 text-2xl font-semibold">What the model learned</h3>
+                    </div>
+                    <span className="rounded-full border border-on-primary/20 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.1em] text-on-primary/70">
+                      v3 → v4
+                    </span>
+                  </div>
+
+                  <div className="relative mt-8 grid grid-cols-2 gap-3">
+                    {[
+                      ["Direction", "Correct", "The winning creative was identified"],
+                      ["Magnitude error", "5.6 pts", "Expected lift was too strong"],
+                      ["Confidence gap", "9 pts", "Certainty requires recalibration"],
+                      ["Data quality", "High", "Outcome passed normalization checks"],
+                    ].map(([label, value, detail], index) => (
+                      <div className="rounded-xl border border-on-primary/16 bg-on-primary/7 p-4" key={label}>
+                        <span
+                          className="mb-5 block size-2 rounded-full"
+                          style={{ backgroundColor: ["var(--success)", "var(--warning)", "var(--accent)", "var(--on-primary)"][index] }}
+                        />
+                        <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-on-primary/55">{label}</p>
+                        <p className="mt-2 text-lg font-semibold">{value}</p>
+                        <p className="mt-2 text-[11px] leading-5 text-on-primary/60">{detail}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="relative mt-6 rounded-xl border border-on-primary/20 bg-on-primary/8 p-5">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-on-primary/55">
+                          Model adjustment
+                        </p>
+                        <p className="mt-2 text-sm font-medium">Reduce expected engagement lift</p>
+                      </div>
+                      <span className="font-mono text-sm font-semibold text-warning">−5.6</span>
+                    </div>
+                    <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-on-primary/12">
+                      <span className="calibration-fill block h-full w-[72%] rounded-full bg-warning" />
+                    </div>
+                    <p className="mt-4 border-l border-on-primary/25 pl-3 text-xs leading-5 text-on-primary/60">
+                      The original prediction remains in the audit trail. Calibration
+                      changes the next estimate—not the historical record.
+                    </p>
+                  </div>
+                </aside>
+              </div>
+            </div>
+
+            <div className="mt-18 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary">
+                The continuous-learning loop
+              </p>
+              <h3 className="mx-auto mt-4 max-w-180 text-3xl font-semibold tracking-[-0.035em] text-balance sm:text-4xl">
+                Every campaign becomes a measured learning event.
+              </h3>
+            </div>
+
+            <div className="learning-loop-track relative mt-10 grid overflow-hidden rounded-2xl border border-border bg-bg lg:grid-cols-4">
+              {learningLoop.map((step, index) => (
+                <article
+                  className="learning-step scroll-reveal relative p-6 not-last:border-b not-last:border-border sm:p-7 lg:not-last:border-b-0 lg:not-last:border-r"
+                  key={step.number}
+                >
+                  <div className="flex items-center justify-between">
+                    <span
+                      className="grid size-11 place-items-center rounded-full border bg-surface font-mono text-xs"
+                      style={{ borderColor: step.color, color: step.color }}
+                    >
+                      {step.number}
+                    </span>
+                    {index < learningLoop.length - 1 && (
+                      <span className="hidden items-center gap-1 lg:flex" aria-hidden="true">
+                        <span className="h-px w-5 bg-border" />
+                        <span className="size-1.5 rounded-full" style={{ backgroundColor: step.color }} />
+                      </span>
+                    )}
+                  </div>
+                  <h4 className="mt-8 text-xl font-semibold">{step.title}</h4>
+                  <p className="mt-3 text-sm leading-6 text-muted">{step.description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="scroll-reveal mt-6 flex flex-col gap-5 rounded-2xl border border-primary/25 bg-primary/6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+              <div className="flex items-start gap-4">
+                <span className="mt-1 grid size-8 shrink-0 place-items-center rounded-full border border-primary/30 text-primary">
+                  <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 16 16">
+                    <path d="M13 5.5A5.5 5.5 0 1 0 13.2 10M13 2v3.5H9.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.4" />
+                  </svg>
+                </span>
+                <div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-primary">
+                    Compounding evidence
+                  </p>
+                  <p className="mt-2 max-w-215 text-base leading-7 text-muted sm:text-lg">
+                    The goal is not a model that claims certainty. It is a system that
+                    knows where it was wrong, preserves the evidence and improves with
+                    every comparable campaign.
+                  </p>
+                </div>
+              </div>
+              <span className="shrink-0 self-start rounded-full border border-primary/25 bg-surface px-4 py-2 font-mono text-[8px] uppercase tracking-[0.13em] text-primary sm:self-center">
+                Auditable by design
+              </span>
             </div>
           </div>
         </section>

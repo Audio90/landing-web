@@ -419,6 +419,85 @@ a {
   transform-origin: left;
 }
 
+.research-workbench {
+  transition:
+    border-color 350ms ease,
+    box-shadow 350ms ease;
+}
+
+.research-workbench:hover {
+  border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
+  box-shadow: 0 32px 90px -52px color-mix(in srgb, var(--primary) 38%, transparent);
+}
+
+.uncertainty-bar {
+  animation: data-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--bar-delay, 0ms) both;
+  transform-origin: bottom;
+}
+
+.research-principle {
+  transition:
+    background-color 300ms ease,
+    transform 300ms ease;
+}
+
+.research-principle:hover {
+  background: color-mix(in srgb, var(--surface-light) 58%, var(--surface));
+  transform: translateY(-3px);
+}
+
+.feedback-console {
+  transition:
+    border-color 350ms ease,
+    box-shadow 350ms ease;
+}
+
+.feedback-console:hover {
+  border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
+  box-shadow: 0 34px 90px -54px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.feedback-transfer {
+  animation: feedback-pulse 2.4s ease-in-out infinite;
+}
+
+.campaign-row {
+  transition: background-color 250ms ease;
+}
+
+.campaign-row:hover {
+  background: color-mix(in srgb, var(--surface-light) 45%, transparent);
+}
+
+.calibration-fill {
+  animation: metric-grow 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+  transform-origin: left;
+}
+
+.learning-step {
+  transition:
+    background-color 300ms ease,
+    transform 300ms ease;
+}
+
+.learning-step:hover {
+  background: var(--surface);
+  transform: translateY(-3px);
+}
+
+@keyframes feedback-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent);
+    transform: translateX(0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 8%, transparent);
+    transform: translateX(3px);
+  }
+}
+
 .solution-node,
 .lab-stage {
   animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) var(--node-delay, 0ms) both;
