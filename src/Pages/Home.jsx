@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Navbar from "../Reusable/Navbar/Navbar";
 
 const creativeA = [
@@ -194,6 +195,45 @@ const learningLoop = [
     number: "04",
     title: "Calibrate",
     description: "Update the next experiment without rewriting the evidence.",
+    color: "var(--success)",
+  },
+];
+
+const businessOutcomes = [
+  {
+    number: "01",
+    eyebrow: "Budget direction",
+    title: "Choose which creative deserves the first impression.",
+    description:
+      "Compare variants before launch and take the strongest-supported hypothesis into a controlled media test.",
+    type: "direction",
+    color: "var(--primary)",
+  },
+  {
+    number: "02",
+    eyebrow: "Creative diagnosis",
+    title: "Understand what changed the response—and why.",
+    description:
+      "Move beyond winner labels to see how the hook, offer, voice, pacing and CTA shaped the audience reaction.",
+    type: "reason",
+    color: "var(--warning)",
+  },
+  {
+    number: "03",
+    eyebrow: "Launch readiness",
+    title: "Know when the evidence is strong enough to act.",
+    description:
+      "Use confidence and disagreement to decide whether to launch, revise the creative or run more research.",
+    type: "confidence",
+    color: "var(--accent)",
+  },
+  {
+    number: "04",
+    eyebrow: "Compounding learning",
+    title: "Turn every campaign into a better next decision.",
+    description:
+      "Preserve the prediction, measure its error against reality and carry the learning into comparable campaigns.",
+    type: "improve",
     color: "var(--success)",
   },
 ];
@@ -495,7 +535,139 @@ function HowVisual({ type }) {
   );
 }
 
+function OutcomeVisual({ type }) {
+  if (type === "direction") {
+    return (
+      <div aria-label="Creative B receives the stronger directional signal" className="rounded-2xl border border-border bg-bg p-4 sm:p-5">
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-muted">Variant preference</p>
+          <span className="rounded-full bg-primary/8 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.1em] text-primary">B leads</span>
+        </div>
+        <div className="mt-5 space-y-4">
+          {[
+            ["Creative A", "33%", "33%", "var(--surface-light)"],
+            ["Creative B", "67%", "67%", "var(--primary)"],
+          ].map(([label, value, width, color]) => (
+            <div key={label}>
+              <div className="flex justify-between text-xs"><span>{label}</span><span className="font-mono text-[10px] text-muted">{value}</span></div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-light">
+                <span className="outcome-fill block h-full rounded-full" style={{ backgroundColor: color, width }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "reason") {
+    return (
+      <div aria-label="Creative attributes contributing to the response" className="rounded-2xl border border-border bg-bg p-4 sm:p-5">
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-muted">Response drivers</p>
+          <span className="font-mono text-[9px] text-warning">Offer +11</span>
+        </div>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          {[
+            ["Hook", "+6", "var(--primary)"],
+            ["Offer", "+11", "var(--warning)"],
+            ["CTA", "+3", "var(--accent)"],
+          ].map(([label, value, color]) => (
+            <div className="rounded-xl border border-border bg-surface p-3 text-center" key={label}>
+              <span className="mx-auto block size-2 rounded-full" style={{ backgroundColor: color }} />
+              <p className="mt-3 text-lg font-semibold">{value}</p>
+              <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.08em] text-muted">{label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "confidence") {
+    return (
+      <div aria-label="Medium prediction confidence recommends a controlled test" className="rounded-2xl border border-border bg-bg p-4 sm:p-5">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[8px] uppercase tracking-[0.13em] text-muted">Confidence</p>
+            <p className="mt-2 text-3xl font-semibold">67%</p>
+          </div>
+          <span className="rounded-full border border-warning/30 bg-warning/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.1em] text-warning">Medium</span>
+        </div>
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-surface-light">
+          <span className="outcome-fill block h-full w-[67%] rounded-full bg-warning" />
+        </div>
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-xs">
+          <span className="text-muted">Recommended action</span>
+          <span className="font-semibold">Run controlled test</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div aria-label="Campaign model improves from version three to version four" className="rounded-2xl border border-border bg-bg p-4 sm:p-5">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className="rounded-xl bg-surface p-3">
+          <p className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted">Before</p>
+          <p className="mt-2 text-xl font-semibold">v3</p>
+        </div>
+        <span className="text-success"><ArrowIcon /></span>
+        <div className="rounded-xl border border-success/25 bg-success/7 p-3">
+          <p className="font-mono text-[8px] uppercase tracking-[0.1em] text-success">Calibrated</p>
+          <p className="mt-2 text-xl font-semibold">v4</p>
+        </div>
+      </div>
+      <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-surface px-3 py-3 text-xs">
+        <span className="text-muted">Magnitude error captured</span>
+        <span className="font-mono font-semibold text-warning">5.6 pts</span>
+      </div>
+    </div>
+  );
+}
+
 function Home() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return undefined;
+    }
+
+    const revealSelector = [
+      ".scroll-reveal",
+      ".problem-step",
+      ".question-row",
+      ".solution-node",
+      ".lab-stage",
+    ].join(",");
+    const revealItems = document.querySelectorAll(revealSelector);
+
+    root.classList.add("reveal-ready");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.classList.toggle("is-visible", entry.isIntersecting);
+        });
+      },
+      {
+        rootMargin: "-3% 0px -6% 0px",
+        threshold: 0.04,
+      },
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+
+    return () => {
+      observer.disconnect();
+      root.classList.remove("reveal-ready");
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-bg text-text" id="top">
       <Navbar />
@@ -907,7 +1079,7 @@ function Home() {
                           : "border-border bg-surface"
                       }`}
                       key={step.number}
-                      style={{ "--step-delay": `${index * 140}ms` }}
+                      style={{ "--step-delay": `${index * 75}ms` }}
                     >
                       <div className="relative z-10 flex items-center justify-between">
                         <span
@@ -946,7 +1118,7 @@ function Home() {
                     <div
                       className="question-row group flex items-center gap-4 rounded-xl border border-border bg-surface px-4 py-4 transition-colors duration-300 hover:border-primary/35"
                       key={question}
-                      style={{ "--question-delay": `${index * 80}ms` }}
+                      style={{ "--question-delay": `${index * 55}ms` }}
                     >
                       <span className="font-mono text-[10px] text-muted">
                         {String(index + 1).padStart(2, "0")}
@@ -1058,7 +1230,7 @@ function Home() {
                     <article
                       className="solution-node input-node group relative flex min-h-25 items-center gap-3 rounded-2xl border border-border/85 bg-surface/80 p-3.5 shadow-lg shadow-black/20 backdrop-blur transition-[border-color,transform,background-color] duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-surface-light/75"
                       key={item.label}
-                      style={{ "--node-delay": `${index * 100}ms` }}
+                      style={{ "--node-delay": `${index * 65}ms` }}
                     >
                       <span
                         className="grid size-10 shrink-0 place-items-center rounded-xl border bg-bg"
@@ -1118,7 +1290,7 @@ function Home() {
                         <div
                           className="lab-stage flex items-center gap-3 rounded-xl bg-bg/70 px-3.5 py-3"
                           key={number}
-                          style={{ "--stage-delay": `${index * 170}ms` }}
+                          style={{ "--stage-delay": `${index * 90}ms` }}
                         >
                           <span className="font-mono text-[9px] text-primary">{number}</span>
                           <span className="h-px w-4 bg-border" />
@@ -1170,7 +1342,7 @@ function Home() {
                     <article
                       className="solution-node output-node group relative flex min-h-25 items-center gap-3 rounded-2xl border border-border/85 bg-surface/80 p-3.5 shadow-lg shadow-black/20 backdrop-blur transition-[border-color,transform,background-color] duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-surface-light/75"
                       key={item.label}
-                      style={{ "--node-delay": `${index * 100}ms` }}
+                      style={{ "--node-delay": `${index * 65}ms` }}
                     >
                       <span
                         aria-hidden="true"
@@ -1332,7 +1504,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="research-workbench mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-surface shadow-2xl shadow-black/8 lg:grid lg:grid-cols-12">
+            <div className="research-workbench scroll-reveal mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-surface shadow-2xl shadow-black/8 lg:grid lg:grid-cols-12">
               <div className="relative overflow-hidden bg-primary p-6 text-on-primary sm:p-8 lg:col-span-5 lg:p-10">
                 <div
                   aria-hidden="true"
@@ -1536,7 +1708,7 @@ function Home() {
               </div>
             </div>
 
-            <div className="feedback-console mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-bg shadow-2xl shadow-black/8">
+            <div className="feedback-console scroll-reveal mt-16 overflow-hidden rounded-[1.75rem] border border-border bg-bg shadow-2xl shadow-black/8">
               <div className="flex flex-col gap-4 border-b border-border bg-surface px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                 <div className="flex items-center gap-4">
                   <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-on-primary">
@@ -1753,6 +1925,105 @@ function Home() {
               <span className="shrink-0 self-start rounded-full border border-primary/25 bg-surface px-4 py-2 font-mono text-[8px] uppercase tracking-[0.13em] text-primary sm:self-center">
                 Auditable by design
               </span>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden border-t border-border bg-bg" id="outcomes">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 opacity-35"
+            style={{
+              backgroundImage:
+                "linear-gradient(90deg, color-mix(in srgb, var(--border) 34%, transparent) 1px, transparent 1px)",
+              backgroundSize: "calc(100% / 6) 100%",
+              maskImage: "linear-gradient(to bottom, transparent, black 18%, black 82%, transparent)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -left-45 top-35 -z-10 size-125 rounded-full opacity-16 blur-3xl"
+            style={{ background: "radial-gradient(circle, var(--primary), transparent 66%)" }}
+          />
+
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-30 lg:px-12 lg:py-36">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-18">
+              <div className="scroll-reveal lg:col-span-7">
+                <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-primary">
+                  From signal to decision
+                </p>
+                <h2 className="mt-6 max-w-215 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                  Move from creative opinions to testable decisions.
+                </h2>
+              </div>
+              <div className="scroll-reveal lg:col-span-5">
+                <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  Audio 90 turns a complex synthetic experiment into a clear next
+                  action—while keeping the evidence, uncertainty and limits attached.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {["Choose", "Understand", "Validate", "Improve"].map((item) => (
+                    <span className="rounded-full border border-border bg-surface px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-muted" key={item}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-16 grid gap-4 lg:grid-cols-2">
+              {businessOutcomes.map((outcome, index) => (
+                <article
+                  className="outcome-card scroll-reveal group grid gap-7 rounded-[1.5rem] border border-border bg-surface p-6 shadow-lg shadow-black/4 sm:p-8 xl:grid-cols-[1fr_0.9fr] xl:items-end"
+                  key={outcome.number}
+                  style={{ "--reveal-delay": `${index * 70}ms` }}
+                >
+                  <div className="flex h-full flex-col">
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="grid size-11 place-items-center rounded-full border font-mono text-xs"
+                        style={{ borderColor: outcome.color, color: outcome.color }}
+                      >
+                        {outcome.number}
+                      </span>
+                      <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-muted">
+                        Decision output
+                      </span>
+                    </div>
+                    <p className="mt-8 font-mono text-[9px] uppercase tracking-[0.17em]" style={{ color: outcome.color }}>
+                      {outcome.eyebrow}
+                    </p>
+                    <h3 className="mt-3 max-w-125 text-2xl font-semibold leading-tight tracking-[-0.025em] text-balance sm:text-3xl">
+                      {outcome.title}
+                    </h3>
+                    <p className="mt-4 max-w-130 text-sm leading-6 text-muted sm:text-base sm:leading-7">
+                      {outcome.description}
+                    </p>
+                  </div>
+                  <OutcomeVisual type={outcome.type} />
+                </article>
+              ))}
+            </div>
+
+            <div className="scroll-reveal mt-6 grid overflow-hidden rounded-2xl border border-primary/25 bg-primary text-on-primary md:grid-cols-[1fr_auto] md:items-center">
+              <div className="p-6 sm:p-8">
+                <p className="font-mono text-[9px] uppercase tracking-[0.17em] text-on-primary/55">
+                  One accountable next step
+                </p>
+                <p className="mt-3 max-w-215 text-xl font-medium leading-8 sm:text-2xl">
+                  Launch Creative B as the stronger hypothesis—then let observed
+                  performance confirm or correct the decision.
+                </p>
+              </div>
+              <div className="flex h-full items-center border-t border-on-primary/15 px-6 py-5 md:border-l md:border-t-0 md:px-8">
+                <div>
+                  <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-on-primary/55">Decision state</p>
+                  <p className="mt-2 flex items-center gap-2 text-sm font-semibold">
+                    <span className="size-2 rounded-full bg-warning" />
+                    Ready for validation
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

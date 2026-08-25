@@ -305,23 +305,6 @@ a {
   translate: 0 -3px;
 }
 
-.scroll-reveal {
-  animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.problem-step,
-.question-row {
-  animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.problem-step {
-  animation-delay: var(--step-delay, 0ms);
-}
-
-.question-row {
-  animation-delay: var(--question-delay, 0ms);
-}
-
 .problem-signal {
   animation: problem-scan 3.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
@@ -485,6 +468,22 @@ a {
   transform: translateY(-3px);
 }
 
+.outcome-card {
+  transition:
+    border-color 320ms ease,
+    box-shadow 320ms ease;
+}
+
+.outcome-card:hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  box-shadow: 0 26px 65px -46px color-mix(in srgb, var(--primary) 38%, transparent);
+}
+
+.outcome-fill {
+  animation: metric-grow 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: left;
+}
+
 @keyframes feedback-pulse {
   0%,
   100% {
@@ -496,15 +495,6 @@ a {
     box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 8%, transparent);
     transform: translateX(3px);
   }
-}
-
-.solution-node,
-.lab-stage {
-  animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) var(--node-delay, 0ms) both;
-}
-
-.lab-stage {
-  animation-delay: var(--stage-delay, 0ms);
 }
 
 @media (width < 80rem) {
@@ -523,16 +513,83 @@ a {
   }
 }
 
-@supports (animation-timeline: view()) {
-  .scroll-reveal,
-  .problem-step,
-  .question-row,
-  .solution-node,
-  .lab-stage {
-    animation-delay: 0ms;
-    animation-timeline: view();
-    animation-range: entry 5% cover 28%;
-  }
+.reveal-ready .scroll-reveal,
+.reveal-ready .problem-step,
+.reveal-ready .question-row,
+.reveal-ready .solution-node,
+.reveal-ready .lab-stage {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0) scale(0.996);
+  transition:
+    opacity 360ms ease-out,
+    transform 420ms cubic-bezier(0.4, 0, 0.6, 1);
+  transition-delay: 0ms;
+  backface-visibility: hidden;
+}
+
+.reveal-ready .scroll-reveal.is-visible,
+.reveal-ready .problem-step.is-visible,
+.reveal-ready .question-row.is-visible,
+.reveal-ready .solution-node.is-visible,
+.reveal-ready .lab-stage.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition-duration: 760ms, 900ms;
+  transition-timing-function:
+    cubic-bezier(0.16, 1, 0.3, 1),
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-ready .scroll-reveal.is-visible {
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-ready .problem-step.is-visible {
+  transition-delay: var(--step-delay, 0ms);
+}
+
+.reveal-ready .question-row.is-visible {
+  transition-delay: var(--question-delay, 0ms);
+}
+
+.reveal-ready .solution-node.is-visible {
+  transition-delay: var(--node-delay, 0ms);
+}
+
+.reveal-ready .lab-stage.is-visible {
+  transition-delay: var(--stage-delay, 0ms);
+}
+
+.reveal-ready .research-principle.is-visible:hover,
+.reveal-ready .learning-step.is-visible:hover {
+  transform: translate3d(0, -3px, 0);
+}
+
+.reveal-ready .solution-node.is-visible:hover {
+  transform: translate3d(0, -4px, 0);
+}
+
+.reveal-ready .uncertainty-bar,
+.reveal-ready .calibration-fill,
+.reveal-ready .scroll-reveal .how-fill,
+.reveal-ready .outcome-fill {
+  animation: none;
+}
+
+.reveal-ready .research-workbench.is-visible .uncertainty-bar {
+  animation: data-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--bar-delay, 0ms) both;
+}
+
+.reveal-ready .feedback-console.is-visible .calibration-fill {
+  animation: metric-grow 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
+}
+
+.reveal-ready .scroll-reveal.is-visible .how-fill {
+  animation: metric-grow 850ms cubic-bezier(0.22, 1, 0.36, 1) var(--fill-delay, 0ms) both;
+}
+
+.reveal-ready .outcome-card.is-visible .outcome-fill {
+  animation: metric-grow 850ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -546,5 +603,15 @@ a {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .scroll-reveal,
+  .problem-step,
+  .question-row,
+  .solution-node,
+  .lab-stage {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
   }
 }
