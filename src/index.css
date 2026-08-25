@@ -8,6 +8,7 @@
   --color-muted: var(--muted);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
   --color-accent: var(--accent);
   --color-warning: var(--warning);
   --color-success: var(--success);
@@ -16,18 +17,19 @@
 }
 
 :root {
-  --bg: #0b0c0a;
-  --surface: #171914;
-  --surface-light: #20231c;
-  --text: #f5f1e8;
-  --muted: #a9ad9f;
-  --primary: #c8ff4d;
-  --primary-hover: #b5ed35;
-  --accent: #ff6b4a;
-  --warning: #f4bd50;
-  --success: #79d98b;
-  --error: #f45b69;
-  --border: #30352a;
+  --bg: #f5f1e8;
+  --surface: #fffdf8;
+  --surface-light: #ebe6dc;
+  --text: #1c2722;
+  --muted: #667069;
+  --primary: #285c46;
+  --primary-hover: #1f4938;
+  --on-primary: #fffdf8;
+  --accent: #c75d3e;
+  --warning: #b37b2c;
+  --success: #3b7950;
+  --error: #b94c53;
+  --border: #d8d1c5;
   --font-sans: Inter, Geist, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
@@ -72,11 +74,380 @@ a {
 }
 
 ::selection {
-  color: var(--bg);
+  color: var(--on-primary);
   background: var(--primary);
 }
 
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(44px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes grid-drift {
+  to {
+    background-position: 72px 72px;
+  }
+}
+
+@keyframes glow-breathe {
+  0%,
+  100% {
+    opacity: 0.18;
+    scale: 0.94;
+  }
+
+  50% {
+    opacity: 0.3;
+    scale: 1.06;
+  }
+}
+
+@keyframes waveform-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.66);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes data-grow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.12);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes audience-signal {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes ring-enter {
+  from {
+    opacity: 0;
+    transform: rotate(-65deg) scale(0.82);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+@keyframes metric-grow {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes problem-scan {
+  from {
+    left: 0;
+  }
+
+  to {
+    left: calc(100% - 0.5rem);
+  }
+}
+
+@keyframes orbit-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes connector-drift {
+  to {
+    stroke-dashoffset: -44;
+  }
+}
+
+@keyframes lab-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+@keyframes lab-person-signal {
+  0%,
+  100% {
+    scale: 0.78;
+  }
+
+  50% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes lab-status-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 38%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+.motion-reveal {
+  animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms) both;
+}
+
+.motion-panel {
+  animation: panel-enter 1000ms cubic-bezier(0.22, 1, 0.36, 1) 480ms both;
+}
+
+.motion-grid {
+  animation: grid-drift 24s linear infinite;
+}
+
+.motion-glow {
+  animation: glow-breathe 8s ease-in-out infinite;
+}
+
+.mockup-shell {
+  transition:
+    border-color 350ms ease,
+    box-shadow 350ms ease,
+    translate 350ms ease;
+}
+
+.mockup-shell:hover {
+  border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
+  box-shadow:
+    0 28px 80px -38px color-mix(in srgb, var(--primary) 30%, transparent),
+    0 24px 50px -24px rgb(16 32 22 / 24%);
+  translate: 0 -4px;
+}
+
+.wave-bar {
+  animation: waveform-pulse ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.distribution-bar {
+  animation: data-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.audience-dot {
+  animation: audience-signal 3.2s ease-in-out infinite;
+  color: var(--primary);
+}
+
+.confidence-ring {
+  animation: ring-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) 780ms both;
+}
+
+.metric-bar {
+  animation: metric-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: left;
+}
+
+.workflow-card {
+  transition:
+    background-color 300ms ease,
+    translate 300ms ease;
+}
+
+.workflow-card:hover {
+  background: color-mix(in srgb, var(--surface-light) 68%, var(--surface));
+  translate: 0 -3px;
+}
+
+.scroll-reveal {
+  animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem-step,
+.question-row {
+  animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.problem-step {
+  animation-delay: var(--step-delay, 0ms);
+}
+
+.question-row {
+  animation-delay: var(--question-delay, 0ms);
+}
+
+.problem-signal {
+  animation: problem-scan 3.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.problem-orbit {
+  animation: orbit-turn 28s linear infinite;
+  transform-origin: center;
+}
+
+.problem-orbit::before,
+.problem-orbit::after {
+  position: absolute;
+  border-radius: 999px;
+  content: "";
+}
+
+.problem-orbit::before {
+  inset: 12%;
+  border: 1px dashed color-mix(in srgb, var(--warning) 18%, transparent);
+}
+
+.problem-orbit::after {
+  top: 12%;
+  left: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--primary);
+  box-shadow: 0 0 24px var(--primary);
+  transform: translate(-50%, -50%);
+}
+
+.connector-base,
+.connector-flow {
+  vector-effect: non-scaling-stroke;
+}
+
+.connector-base {
+  stroke: color-mix(in srgb, var(--muted) 28%, transparent);
+  stroke-width: 1;
+}
+
+.connector-flow {
+  animation: connector-drift 2.2s linear var(--connector-delay, 0ms) infinite;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary) 55%, transparent));
+  stroke: var(--primary);
+  stroke-dasharray: 3 16;
+  stroke-linecap: round;
+  stroke-width: 1.7;
+}
+
+.lab-core {
+  animation: lab-breathe 4.5s ease-in-out infinite;
+}
+
+.solution-halo {
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--primary) 12%, transparent),
+    transparent 67%
+  );
+  filter: blur(10px);
+}
+
+.lab-mark {
+  background-image: radial-gradient(
+    circle at 35% 25%,
+    color-mix(in srgb, var(--primary) 24%, transparent),
+    transparent 68%
+  );
+}
+
+.lab-status {
+  animation: lab-status-pulse 1.8s ease-out infinite;
+}
+
+.lab-person {
+  animation: lab-person-signal 2.8s ease-in-out var(--person-delay, 0ms) infinite;
+}
+
+.solution-node,
+.lab-stage {
+  animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) var(--node-delay, 0ms) both;
+}
+
+.lab-stage {
+  animation-delay: var(--stage-delay, 0ms);
+}
+
+@media (width < 80rem) {
+  .solution-column {
+    padding-left: 1.25rem;
+  }
+
+  .solution-column::before {
+    position: absolute;
+    top: 2.4rem;
+    bottom: 0.5rem;
+    left: 0.3rem;
+    width: 1px;
+    background: linear-gradient(transparent, var(--primary), var(--border), var(--accent), transparent);
+    content: "";
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .scroll-reveal,
+  .problem-step,
+  .question-row,
+  .solution-node,
+  .lab-stage {
+    animation-delay: 0ms;
+    animation-timeline: view();
+    animation-range: entry 5% cover 28%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

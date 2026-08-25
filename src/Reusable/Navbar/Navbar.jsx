@@ -61,7 +61,7 @@ function Navbar() {
 
         <div className="hidden lg:block">
           <a
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-primary px-5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-bg"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-primary px-5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-on-primary"
             href="#beta"
           >
             Join Beta
@@ -116,7 +116,7 @@ function Navbar() {
               </a>
             ))}
             <a
-              className="mt-3 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-5 font-semibold text-bg"
+              className="mt-3 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-5 font-semibold text-on-primary"
               href="#beta"
               onClick={closeMenu}
             >

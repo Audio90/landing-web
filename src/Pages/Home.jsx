@@ -1,10 +1,940 @@
 import Navbar from "../Reusable/Navbar/Navbar";
 
+const creativeA = [
+  18, 34, 48, 24, 56, 42, 64, 30, 46, 70, 38, 52, 28, 60, 44, 72, 36,
+  58, 32, 50, 68, 40, 56, 26, 62, 46, 34, 54, 38, 64, 30, 44,
+];
+
+const creativeB = [
+  22, 46, 68, 34, 76, 52, 84, 42, 72, 58, 88, 48, 78, 64, 92, 54, 82,
+  60, 74, 48, 86, 56, 70, 44, 80, 62, 50, 76, 54, 84, 46, 68,
+];
+
+const distribution = [18, 24, 30, 38, 52, 68, 86, 100, 82, 64, 46, 32, 22];
+
+const workflow = [
+  {
+    number: "01",
+    title: "Define",
+    description: "Describe the audience and campaign context.",
+    color: "var(--primary)",
+  },
+  {
+    number: "02",
+    title: "Test",
+    description: "Compare A/B creatives before launch.",
+    color: "var(--accent)",
+  },
+  {
+    number: "03",
+    title: "Launch",
+    description: "Take the strongest hypothesis to market.",
+    color: "var(--warning)",
+  },
+  {
+    number: "04",
+    title: "Learn",
+    description: "Calibrate the next prediction with reality.",
+    color: "var(--primary)",
+  },
+];
+
+const testingLoop = [
+  {
+    number: "01",
+    title: "Create variants",
+    description: "Build multiple hooks, offers, voices and calls to action.",
+    color: "var(--warning)",
+  },
+  {
+    number: "02",
+    title: "Spend to test",
+    description: "Buy real impressions before knowing which direction resonates.",
+    color: "var(--accent)",
+    active: true,
+  },
+  {
+    number: "03",
+    title: "Learn after launch",
+    description: "Discover the weaker hypothesis after budget is already committed.",
+    color: "var(--primary)",
+  },
+];
+
+const unansweredQuestions = [
+  "Does the hook earn attention?",
+  "Is the offer understood?",
+  "Will the audience remember the brand?",
+  "Does the CTA feel convincing?",
+  "Which variant deserves live traffic first?",
+];
+
+const trustSignals = [
+  ["01", "Prediction, not promise"],
+  ["02", "Uncertainty stays visible"],
+  ["03", "Reality calibrates the model"],
+];
+
+const experimentInputs = [
+  {
+    type: "audience",
+    label: "Target audience",
+    title: "Mumbai · 18–30",
+    detail: "Hinglish · Evening commute",
+    color: "var(--primary)",
+  },
+  {
+    type: "creative",
+    label: "Creative variants",
+    title: "Audio A / Audio B",
+    detail: "Hook · Voice · Offer · CTA",
+    color: "var(--warning)",
+  },
+  {
+    type: "context",
+    label: "Campaign context",
+    title: "Spotify awareness",
+    detail: "Food delivery · 30 seconds",
+    color: "var(--accent)",
+  },
+];
+
+const experimentOutputs = [
+  {
+    label: "Direction",
+    title: "Creative B leads",
+    detail: "Stronger pre-market hypothesis",
+    value: "B",
+    color: "var(--primary)",
+  },
+  {
+    label: "Why it leads",
+    title: "Value lands earlier",
+    detail: "Clearer message and offer recall",
+    value: "+",
+    color: "var(--warning)",
+  },
+  {
+    label: "Uncertainty",
+    title: "Medium confidence",
+    detail: "Audience disagreement remains visible",
+    value: "67",
+    color: "var(--accent)",
+  },
+];
+
+function NodeIcon({ type }) {
+  if (type === "audience") {
+    return (
+      <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 20 20">
+        <circle cx="10" cy="6.5" r="3" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M4.5 16c.5-3 2.4-4.5 5.5-4.5s5 1.5 5.5 4.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+      </svg>
+    );
+  }
+
+  if (type === "creative") {
+    return (
+      <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 20 20">
+        <path d="M2.5 10h2l1.5-5 2.2 10 2.2-8 1.8 6 1.5-3h3.8" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
+      <path d="M10 6v4l2.8 1.8" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function ArrowIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+      fill="none"
+      viewBox="0 0 16 16"
+    >
+      <path
+        d="M3 8h10m-4-4 4 4-4 4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.5"
+      />
+    </svg>
+  );
+}
+
+function Waveform({ bars, color }) {
+  return (
+    <div aria-hidden="true" className="flex h-14 items-center gap-0.75 overflow-hidden">
+      {bars.map((height, index) => (
+        <span
+          className="wave-bar w-0.75 shrink-0 rounded-full"
+          key={`${height}-${index}`}
+          style={{
+            animationDelay: `${index * 38}ms`,
+            animationDuration: `${1100 + (index % 6) * 130}ms`,
+            backgroundColor: color,
+            height: `${Math.max(10, height * 0.52)}px`,
+            opacity: 0.55 + (index / bars.length) * 0.45,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CreativeRow({ label, bars, color, duration }) {
+  return (
+    <div className="rounded-xl border border-border bg-bg/65 p-4">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-muted">
+            {label}
+          </p>
+          <p className="mt-1 text-xs text-muted">Audio advertisement</p>
+        </div>
+        <span className="rounded-full border border-border px-2.5 py-1 font-mono text-[10px] text-muted">
+          {duration}
+        </span>
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="grid size-9 shrink-0 place-items-center rounded-full border border-border text-text"
+        >
+          <svg aria-hidden="true" className="ml-0.5 size-3" viewBox="0 0 12 12">
+            <path d="M10 6 2.5 10V2L10 6Z" fill="currentColor" />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <Waveform bars={bars} color={color} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Home() {
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <div className="min-h-screen bg-bg text-text" id="top">
       <Navbar />
-      <main id="main-content" />
+      <main id="main-content">
+        <section className="relative isolate overflow-hidden" id="product">
+          <div
+            aria-hidden="true"
+            className="motion-grid absolute inset-0 -z-20 opacity-35"
+            style={{
+              backgroundImage:
+                "linear-gradient(color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 38%, transparent) 1px, transparent 1px)",
+              backgroundSize: "72px 72px",
+              maskImage:
+                "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="motion-glow absolute left-1/2 top-8 -z-10 h-120 w-190 -translate-x-1/2 rounded-full opacity-25 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(circle, var(--warning) 0%, transparent 62%)",
+            }}
+          />
+
+          <div className="mx-auto max-w-360 px-5 pb-20 pt-20 sm:px-8 sm:pt-24 lg:px-12 lg:pb-28 lg:pt-30">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-end lg:gap-16">
+              <div className="lg:col-span-7">
+                <p
+                  className="motion-reveal font-mono text-xs font-medium uppercase tracking-[0.26em] text-primary sm:text-sm"
+                  style={{ "--delay": "80ms" }}
+                >
+                  Synthetic audience intelligence
+                </p>
+                <h1
+                  className="motion-reveal mt-6 max-w-210 text-5xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl lg:text-7xl xl:text-[5rem]"
+                  style={{ "--delay": "150ms" }}
+                >
+                  Know what might work before you spend to find out.
+                </h1>
+              </div>
+
+              <div className="lg:col-span-5">
+                <div
+                  className="motion-reveal border-l-2 border-primary pl-5 sm:pl-7"
+                  style={{ "--delay": "240ms" }}
+                >
+                  <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                    Test creative direction against synthetic audiences before launch,
+                    then calibrate every prediction with real campaign results.
+                  </p>
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <a
+                      className="group inline-flex min-h-13 items-center justify-center gap-3 rounded-lg bg-primary px-6 text-sm font-semibold text-on-primary shadow-[0_0_0_0_var(--primary)] transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-[0_10px_35px_-12px_var(--primary)]"
+                      href="#beta"
+                    >
+                      Join the Beta
+                      <ArrowIcon />
+                    </a>
+                    <a
+                      className="group inline-flex min-h-13 items-center justify-center gap-3 rounded-lg border border-border bg-surface/75 px-6 text-sm font-semibold text-text transition-[border-color,background-color,transform] duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-surface"
+                      href="#how-it-works"
+                    >
+                      See how it works
+                      <ArrowIcon />
+                    </a>
+                  </div>
+                </div>
+
+                <div
+                  className="motion-reveal mt-8 rounded-2xl border border-border bg-surface/80 p-5 shadow-lg shadow-black/5 backdrop-blur sm:p-6"
+                  style={{ "--delay": "360ms" }}
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
+                      Responsible by design
+                    </p>
+                    <span className="rounded-full bg-primary/8 px-2.5 py-1 font-mono text-[8px] uppercase tracking-[0.14em] text-primary">
+                      Calibrated
+                    </span>
+                  </div>
+                  <div className="mt-4 divide-y divide-border">
+                    {trustSignals.map(([number, label]) => (
+                      <div className="flex items-center gap-4 py-3 first:pt-0 last:pb-0" key={number}>
+                        <span className="font-mono text-[9px] text-primary">{number}</span>
+                        <span className="text-sm font-medium text-text">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative mx-auto mt-18 max-w-330">
+              <div
+                aria-hidden="true"
+                className="absolute -inset-5 -z-10 rounded-[2rem] opacity-25 blur-2xl"
+                style={{
+                  background:
+                    "linear-gradient(110deg, var(--primary), transparent 38%, var(--accent))",
+                }}
+              />
+
+              <div
+                aria-label="Audio 90 synthetic audience experiment preview"
+                className="mockup-shell motion-panel overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl shadow-black/12"
+              >
+                <div className="flex min-h-14 items-center justify-between border-b border-border px-4 sm:px-6">
+                  <div aria-hidden="true" className="flex gap-2">
+                    <span className="size-2.5 rounded-full bg-accent" />
+                    <span className="size-2.5 rounded-full bg-warning" />
+                    <span className="size-2.5 rounded-full bg-primary/70" />
+                  </div>
+                  <div className="flex self-stretch font-mono text-[10px] uppercase tracking-[0.16em] text-muted sm:text-xs">
+                    <span className="flex items-center border-b-2 border-primary px-3 text-primary sm:px-5">
+                      Experiment
+                    </span>
+                    <span className="hidden items-center px-3 sm:flex sm:px-5">Results</span>
+                    <span className="hidden items-center px-3 sm:flex sm:px-5">Calibration</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-muted">A90-024</span>
+                </div>
+
+                <div className="grid gap-px bg-border lg:grid-cols-12">
+                  <div className="bg-surface p-4 sm:p-6 lg:col-span-4">
+                    <div className="mb-5 flex items-end justify-between">
+                      <div>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                          Creative test
+                        </p>
+                        <h2 className="mt-1 text-lg font-semibold">A/B audio variants</h2>
+                      </div>
+                      <span className="rounded-full bg-surface-light px-2.5 py-1 font-mono text-[10px] text-muted">
+                        Spotify
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      <CreativeRow
+                        bars={creativeA}
+                        color="var(--warning)"
+                        duration="0:30"
+                        label="Creative A"
+                      />
+                      <CreativeRow
+                        bars={creativeB}
+                        color="var(--primary)"
+                        duration="0:28"
+                        label="Creative B"
+                      />
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-2 font-mono text-[9px] uppercase tracking-[0.08em] text-muted">
+                      <span className="rounded-lg border border-border px-2 py-2 text-center">Hook</span>
+                      <span className="rounded-lg border border-border px-2 py-2 text-center">Voice</span>
+                      <span className="rounded-lg border border-border px-2 py-2 text-center">CTA</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-surface p-4 sm:p-6 lg:col-span-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                          Synthetic prediction
+                        </p>
+                        <h2 className="mt-2 text-2xl font-semibold">
+                          Creative B leads
+                        </h2>
+                      </div>
+                      <span className="rounded-full border border-warning/45 bg-warning/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-warning">
+                        Medium confidence
+                      </span>
+                    </div>
+
+                    <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-border bg-bg/65 p-4">
+                        <div className="flex items-end justify-between">
+                          <p className="text-sm font-medium">Preference distribution</p>
+                          <p className="text-3xl font-semibold text-primary">67%</p>
+                        </div>
+                        <div className="mt-6 flex h-24 items-end justify-center gap-1.5">
+                          {distribution.map((height, index) => (
+                            <span
+                              className="distribution-bar w-2 rounded-t-sm"
+                              key={`${height}-${index}`}
+                              style={{
+                                animationDelay: `${620 + index * 45}ms`,
+                                backgroundColor:
+                                  index < 6 ? "var(--warning)" : "var(--primary)",
+                                height: `${height}%`,
+                                opacity: 0.42 + Math.abs(6 - index) * 0.04,
+                                transformOrigin: "bottom",
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <div className="mt-3 flex justify-between font-mono text-[9px] uppercase text-muted">
+                          <span>More likely A</span>
+                          <span>More likely B</span>
+                        </div>
+                      </div>
+
+                      <div className="rounded-xl border border-border bg-bg/65 p-4">
+                        <p className="text-sm font-medium">Synthetic audience</p>
+                        <div className="mt-5 grid grid-cols-8 gap-2">
+                          {Array.from({ length: 48 }, (_, index) => (
+                            <span
+                              className="audience-dot aspect-square rounded-full"
+                              key={index}
+                              style={{
+                                animationDelay: `${700 + index * 24}ms`,
+                                backgroundColor:
+                                  index % 7 === 0
+                                    ? "var(--accent)"
+                                    : index < 31
+                                      ? "var(--primary)"
+                                      : "var(--surface-light)",
+                                opacity: index < 31 ? 0.9 : 0.72,
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <div className="mt-5 flex items-center justify-between text-xs text-muted">
+                          <span>12,540 profiles</span>
+                          <span>Mumbai · 18–30</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 rounded-xl border border-border bg-bg/65 p-4">
+                      <div className="mb-3 flex items-center justify-between">
+                        <p className="text-sm font-medium">Why B leads</p>
+                        <span className="font-mono text-[10px] text-primary">+18% clarity</span>
+                      </div>
+                      <p className="text-sm leading-6 text-muted">
+                        Listeners understand the product value earlier and reach the
+                        offer with less message ambiguity.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-surface p-4 sm:p-6 lg:col-span-3">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted">
+                      Confidence summary
+                    </p>
+                    <div className="mt-6 flex justify-center">
+                      <div
+                        className="confidence-ring grid size-36 place-items-center rounded-full"
+                        style={{
+                          background:
+                            "conic-gradient(var(--primary) 0 67%, var(--surface-light) 67% 100%)",
+                        }}
+                      >
+                        <div className="grid size-27 place-items-center rounded-full bg-surface text-center">
+                          <div>
+                            <p className="text-4xl font-semibold">67%</p>
+                            <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.12em] text-muted">
+                              panel preference
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 space-y-3">
+                      {[
+                        ["Message clarity", "78", "var(--primary)"],
+                        ["Offer recall", "71", "var(--warning)"],
+                        ["Skip likelihood", "32", "var(--accent)"],
+                      ].map(([label, value, color], index) => (
+                        <div className="rounded-lg border border-border bg-bg/65 p-3" key={label}>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted">{label}</span>
+                            <span className="font-mono">{value}%</span>
+                          </div>
+                          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-light">
+                            <span
+                              className="metric-bar block h-full rounded-full"
+                              style={{
+                                animationDelay: `${920 + index * 120}ms`,
+                                backgroundColor: color,
+                                width: `${value}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mt-5 rounded-lg border border-warning/35 bg-warning/8 px-3 py-3 text-xs leading-5 text-muted">
+                      Synthetic estimate — validate through a real campaign test.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-4 border-t border-border bg-bg/75 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                  <div className="flex flex-wrap gap-x-8 gap-y-3 font-mono text-[9px] uppercase tracking-[0.1em] text-muted">
+                    <span>Model · A90-SYNTH-1.2</span>
+                    <span>Panel · 12,540</span>
+                    <span>Updated · 2 min ago</span>
+                  </div>
+                  <span className="group inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-xs font-semibold">
+                    View full report
+                    <ArrowIcon />
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div
+              className="mx-auto mt-5 grid max-w-330 overflow-hidden rounded-2xl border border-border bg-surface sm:grid-cols-2 lg:grid-cols-4"
+              id="how-it-works"
+            >
+              {workflow.map((item, index) => (
+                <div
+                  className="motion-reveal workflow-card relative flex min-h-35 gap-4 border-border p-5 not-last:border-b sm:nth-[2]:border-b-0 sm:nth-[odd]:border-r lg:not-last:border-b-0 lg:not-last:border-r"
+                  key={item.number}
+                  style={{ "--delay": `${720 + index * 90}ms` }}
+                >
+                  <span
+                    className="grid size-11 shrink-0 place-items-center rounded-full border font-mono text-xs"
+                    style={{ borderColor: item.color, color: item.color }}
+                  >
+                    {item.number}
+                  </span>
+                  <div>
+                    <p className="font-mono text-xs uppercase tracking-[0.16em]" style={{ color: item.color }}>
+                      {item.title}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-muted">{item.description}</p>
+                  </div>
+                  {index < workflow.length - 1 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -right-2 top-1/2 z-10 hidden size-4 -translate-y-1/2 rounded-full border border-border bg-bg lg:block"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="relative isolate overflow-hidden border-y border-border bg-surface"
+          id="problem"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-20 opacity-45"
+            style={{
+              backgroundImage:
+                "linear-gradient(color-mix(in srgb, var(--border) 30%, transparent) 1px, transparent 1px)",
+              backgroundSize: "100% 88px",
+              maskImage:
+                "linear-gradient(90deg, transparent, black 18%, black 82%, transparent)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="problem-orbit absolute -right-48 top-10 -z-10 size-140 rounded-full border border-primary/15 sm:-right-30"
+          />
+
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-28 lg:px-12 lg:py-36">
+            <div className="grid gap-14 lg:grid-cols-12 lg:items-end lg:gap-10">
+              <div className="scroll-reveal lg:col-span-7">
+                <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-accent">
+                  The cost of learning
+                </p>
+                <h2 className="mt-6 max-w-215 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                  You&apos;re spending real money to learn which creative doesn&apos;t work.
+                </h2>
+              </div>
+              <div className="scroll-reveal lg:col-span-5 lg:pb-1">
+                <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  Most creative experiments begin only after the media buy. The
+                  campaign becomes the research panel, and every weak hypothesis
+                  is paid for with real impressions.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-16 grid overflow-hidden rounded-2xl border border-border bg-bg shadow-2xl shadow-black/10 lg:grid-cols-12">
+              <div className="relative border-b border-border p-5 sm:p-8 lg:col-span-7 lg:border-b-0 lg:border-r lg:p-10">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+                      Traditional testing loop
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold sm:text-2xl">
+                      Insight arrives after investment
+                    </h3>
+                  </div>
+                  <span className="hidden rounded-full border border-accent/35 bg-accent/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-accent sm:block">
+                    Live media
+                  </span>
+                </div>
+
+                <div className="relative mt-9 grid gap-3 md:grid-cols-3">
+                  <div
+                    aria-hidden="true"
+                    className="problem-track absolute left-[15%] right-[15%] top-9 hidden h-px bg-border md:block"
+                  >
+                    <span className="problem-signal absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_18px_var(--accent)]" />
+                  </div>
+                  {testingLoop.map((step, index) => (
+                    <article
+                      className={`problem-step relative rounded-xl border p-5 ${
+                        step.active
+                          ? "border-accent/45 bg-accent/8"
+                          : "border-border bg-surface"
+                      }`}
+                      key={step.number}
+                      style={{ "--step-delay": `${index * 140}ms` }}
+                    >
+                      <div className="relative z-10 flex items-center justify-between">
+                        <span
+                          className="grid size-11 place-items-center rounded-full border bg-bg font-mono text-xs"
+                          style={{ borderColor: step.color, color: step.color }}
+                        >
+                          {step.number}
+                        </span>
+                      </div>
+                      <h4 className="relative z-10 mt-8 text-base font-semibold">
+                        {step.title}
+                      </h4>
+                      <p className="relative z-10 mt-2 text-sm leading-6 text-muted">
+                        {step.description}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex flex-col gap-3 rounded-xl border border-warning/25 bg-warning/6 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-warning">
+                    Budget status
+                  </span>
+                  <span className="text-sm text-muted">
+                    Committed before the first useful creative signal
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-5 sm:p-8 lg:col-span-5 lg:p-10">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
+                  Still unanswered before launch
+                </p>
+                <div className="mt-6 space-y-2.5">
+                  {unansweredQuestions.map((question, index) => (
+                    <div
+                      className="question-row group flex items-center gap-4 rounded-xl border border-border bg-surface px-4 py-4 transition-colors duration-300 hover:border-primary/35"
+                      key={question}
+                      style={{ "--question-delay": `${index * 80}ms` }}
+                    >
+                      <span className="font-mono text-[10px] text-muted">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <p className="flex-1 text-sm font-medium sm:text-base">{question}</p>
+                      <span className="grid size-7 place-items-center rounded-full border border-border font-mono text-xs text-muted transition-colors duration-300 group-hover:border-primary/40 group-hover:text-primary">
+                        ?
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="scroll-reveal mt-8 flex flex-col gap-5 rounded-2xl border border-primary/25 bg-primary/6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+              <div className="flex items-start gap-4">
+                <span className="mt-1 size-2.5 shrink-0 rounded-full bg-primary shadow-[0_0_18px_var(--primary)]" />
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+                    A better place to begin
+                  </p>
+                  <p className="mt-2 max-w-205 text-lg font-medium leading-7 sm:text-xl">
+                    Audio 90 moves part of creative learning before launch, so live
+                    media validates stronger hypotheses instead of discovering them.
+                  </p>
+                </div>
+              </div>
+              <span className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/8 px-4 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
+                Next · Pre-market signal
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative isolate overflow-hidden bg-bg" id="solution">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 -z-20 h-130 opacity-30"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 10%, color-mix(in srgb, var(--primary) 30%, transparent), transparent 62%)",
+            }}
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-30 opacity-30"
+            style={{
+              backgroundImage:
+                "linear-gradient(color-mix(in srgb, var(--border) 36%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 36%, transparent) 1px, transparent 1px)",
+              backgroundSize: "64px 64px",
+              maskImage:
+                "linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)",
+            }}
+          />
+
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-30 lg:px-10 lg:py-36 2xl:px-12">
+            <div className="mx-auto max-w-225 text-center scroll-reveal">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-primary">
+                The pre-market layer
+              </p>
+              <h2 className="mt-6 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                Move the first round of learning before the media buy.
+              </h2>
+              <p className="mx-auto mt-6 max-w-180 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                Audio 90 connects what you know about the audience, creative and
+                campaign context to a controlled synthetic experiment—then returns
+                a direction, the reasons behind it and honest uncertainty.
+              </p>
+            </div>
+
+            <div className="solution-map relative mx-auto mt-18 max-w-300 xl:min-h-155">
+              <div
+                aria-hidden="true"
+                className="solution-halo absolute left-1/2 top-1/2 hidden h-120 w-150 -translate-x-1/2 -translate-y-1/2 rounded-full xl:block"
+              />
+
+              <svg
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 hidden size-full xl:block"
+                fill="none"
+                preserveAspectRatio="none"
+                viewBox="0 0 1200 620"
+              >
+                {[
+                  "M250 206 C320 206 320 260 370 280",
+                  "M250 326 C320 326 330 326 370 326",
+                  "M250 446 C320 446 320 390 370 372",
+                  "M830 280 C880 260 880 206 950 206",
+                  "M830 326 C870 326 880 326 950 326",
+                  "M830 372 C880 390 880 446 950 446",
+                ].map((path, index) => (
+                  <g key={path}>
+                    <path className="connector-base" d={path} />
+                    <path
+                      className="connector-flow"
+                      d={path}
+                      style={{ "--connector-delay": `${index * -520}ms` }}
+                    />
+                  </g>
+                ))}
+              </svg>
+
+              <div className="relative grid gap-10 xl:min-h-155 xl:grid-cols-[250px_minmax(460px,1fr)_250px] xl:items-center xl:gap-25">
+                <div className="solution-column relative space-y-5">
+                  <p className="px-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
+                    01 · Inputs
+                  </p>
+                  {experimentInputs.map((item, index) => (
+                    <article
+                      className="solution-node input-node group relative flex min-h-25 items-center gap-3 rounded-2xl border border-border/85 bg-surface/80 p-3.5 shadow-lg shadow-black/20 backdrop-blur transition-[border-color,transform,background-color] duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-surface-light/75"
+                      key={item.label}
+                      style={{ "--node-delay": `${index * 100}ms` }}
+                    >
+                      <span
+                        className="grid size-10 shrink-0 place-items-center rounded-xl border bg-bg"
+                        style={{ borderColor: item.color, color: item.color }}
+                      >
+                        <NodeIcon type={item.type} />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-muted">
+                          {item.label}
+                        </p>
+                        <h3 className="mt-1 text-sm font-semibold">{item.title}</h3>
+                        <p className="mt-1 truncate text-[11px] text-muted">{item.detail}</p>
+                      </div>
+                      <span
+                        aria-hidden="true"
+                        className="connector-port absolute -right-1.5 top-1/2 hidden size-3 -translate-y-1/2 rounded-full border-2 border-bg xl:block"
+                        style={{ backgroundColor: item.color }}
+                      />
+                    </article>
+                  ))}
+                </div>
+
+                <div className="lab-core relative z-10 mx-auto w-full max-w-115 overflow-hidden rounded-[1.75rem] border border-primary/40 bg-surface shadow-[0_32px_100px_-44px_var(--primary)]">
+                  <div className="h-px bg-linear-to-r from-transparent via-primary to-transparent" />
+                  <div className="p-5 sm:p-7">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3.5">
+                        <span className="lab-mark grid size-12 place-items-center rounded-2xl border border-primary/35 bg-primary/8 text-primary">
+                          <svg aria-hidden="true" className="size-6" fill="none" viewBox="0 0 24 24">
+                            <path d="M4 12h2.2l1.5-5 2.1 10 2.4-12 2.2 13 1.7-8 1.5 4H20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" />
+                          </svg>
+                        </span>
+                        <div>
+                          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">
+                            Audio 90 engine
+                          </p>
+                          <h3 className="mt-1 text-xl font-semibold sm:text-2xl">
+                            Synthetic Audience Lab
+                          </h3>
+                        </div>
+                      </div>
+                      <span className="mt-1 flex items-center gap-2 rounded-full bg-primary/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.14em] text-primary">
+                        <span className="lab-status size-1.5 rounded-full bg-primary" />
+                        Live
+                      </span>
+                    </div>
+
+                    <div className="my-6 h-px bg-border" />
+
+                    <div className="space-y-2">
+                      {[
+                        ["01", "Creative understanding", "Genome"],
+                        ["02", "Audience simulation", "Panel"],
+                        ["03", "Response modelling", "Signal"],
+                      ].map(([number, label, value], index) => (
+                        <div
+                          className="lab-stage flex items-center gap-3 rounded-xl bg-bg/70 px-3.5 py-3"
+                          key={number}
+                          style={{ "--stage-delay": `${index * 170}ms` }}
+                        >
+                          <span className="font-mono text-[9px] text-primary">{number}</span>
+                          <span className="h-px w-4 bg-border" />
+                          <span className="min-w-0 flex-1 text-xs text-muted sm:text-sm">{label}</span>
+                          <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-text">
+                            {value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-5 rounded-2xl bg-bg/80 p-4">
+                      <div className="flex items-center justify-between">
+                        <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-muted">
+                          Synthetic panel
+                        </p>
+                        <p className="flex items-center gap-2 font-mono text-[8px] text-primary">
+                          <span className="size-1.5 rounded-full bg-primary" />
+                          Comparing A/B
+                        </p>
+                      </div>
+                      <div className="mt-4 grid grid-cols-12 gap-2">
+                        {Array.from({ length: 36 }, (_, index) => (
+                          <span
+                            className="lab-person aspect-square rounded-full bg-primary"
+                            key={index}
+                            style={{
+                              "--person-delay": `${index * 55}ms`,
+                              opacity:
+                                index % 8 === 0 ? 0.25 : index % 5 === 0 ? 0.48 : 0.88,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-5 flex items-center justify-center gap-2 text-center font-mono text-[8px] uppercase tracking-[0.15em] text-muted">
+                      <span className="size-1.5 rounded-full bg-warning" />
+                      Estimate, not ground truth
+                    </div>
+                  </div>
+                </div>
+
+                <div className="solution-column relative space-y-5">
+                  <p className="px-1 font-mono text-[10px] uppercase tracking-[0.22em] text-muted">
+                    02 · Signal
+                  </p>
+                  {experimentOutputs.map((item, index) => (
+                    <article
+                      className="solution-node output-node group relative flex min-h-25 items-center gap-3 rounded-2xl border border-border/85 bg-surface/80 p-3.5 shadow-lg shadow-black/20 backdrop-blur transition-[border-color,transform,background-color] duration-300 hover:-translate-y-1 hover:border-primary/35 hover:bg-surface-light/75"
+                      key={item.label}
+                      style={{ "--node-delay": `${index * 100}ms` }}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="connector-port absolute -left-1.5 top-1/2 hidden size-3 -translate-y-1/2 rounded-full border-2 border-bg xl:block"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span
+                        className="grid size-10 shrink-0 place-items-center rounded-xl border bg-bg font-mono text-xs font-semibold"
+                        style={{ borderColor: item.color, color: item.color }}
+                      >
+                        {item.value}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-muted">
+                          {item.label}
+                        </p>
+                        <h3 className="mt-1 text-sm font-semibold">{item.title}</h3>
+                        <p className="mt-1 text-[11px] leading-4 text-muted">{item.detail}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="scroll-reveal mx-auto mt-12 flex max-w-210 items-center gap-4 text-center">
+              <span className="h-px flex-1 bg-linear-to-r from-transparent to-warning/50" />
+              <div>
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-warning">
+                  Then reality closes the loop
+                </p>
+                <p className="mt-2 text-sm text-muted">
+                  Launch the strongest hypothesis and return the real campaign result.
+                </p>
+              </div>
+              <span className="h-px flex-1 bg-linear-to-l from-transparent to-warning/50" />
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }
