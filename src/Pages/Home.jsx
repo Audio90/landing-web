@@ -75,6 +75,49 @@ const trustSignals = [
   ["03", "Reality calibrates the model"],
 ];
 
+const howSteps = [
+  {
+    number: "01",
+    eyebrow: "Audience definition",
+    title: "Describe who the campaign needs to reach.",
+    description:
+      "Combine demographic, behavioral and campaign context into a structured audience definition—not a collection of cartoon personas.",
+    points: ["Audience composition", "Campaign objective", "Listening context"],
+    note: "Creates the experiment population",
+    type: "audience",
+  },
+  {
+    number: "02",
+    eyebrow: "Creative understanding",
+    title: "Upload the variants you are deciding between.",
+    description:
+      "Audio 90 analyzes more than the transcript. It maps the hook, voice, pacing, offer, CTA, music and other attributes into a structured Creative Genome.",
+    points: ["A/B audio variants", "Creative Genome", "Controlled comparison"],
+    note: "Understands what changed inside the ad",
+    type: "creative",
+  },
+  {
+    number: "03",
+    eyebrow: "Pre-market signal",
+    title: "See the direction, reasons and disagreement.",
+    description:
+      "The synthetic panel returns a hypothesis about which direction appears stronger, why it leads and how much uncertainty remains before launch.",
+    points: ["Preference distribution", "Recall and clarity", "Visible uncertainty"],
+    note: "Synthetic estimate—not observed performance",
+    type: "signal",
+  },
+  {
+    number: "04",
+    eyebrow: "Real-world calibration",
+    title: "Launch the strongest test and teach the model.",
+    description:
+      "Upload actual campaign performance after launch. Audio 90 compares prediction with reality, measures the error and calibrates the next experiment.",
+    points: ["Normalized campaign data", "Prediction versus reality", "Campaign model update"],
+    note: "Every campaign makes the next one smarter",
+    type: "calibration",
+  },
+];
+
 const experimentInputs = [
   {
     type: "audience",
@@ -213,6 +256,159 @@ function CreativeRow({ label, bars, color, duration }) {
         </span>
         <div className="min-w-0 flex-1">
           <Waveform bars={bars} color={color} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HowVisual({ type }) {
+  if (type === "audience") {
+    return (
+      <div aria-label="Audience definition example" className="how-visual rounded-2xl border border-border bg-surface p-5 shadow-xl shadow-black/6 sm:p-7">
+        <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.17em] text-primary">Audience builder</p>
+            <p className="mt-1 text-lg font-semibold">Late-night delivery · Mumbai</p>
+          </div>
+          <span className="rounded-full bg-primary/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-primary">
+            Draft panel
+          </span>
+        </div>
+        <div className="mt-5 grid gap-2.5 sm:grid-cols-3">
+          {[
+            ["Age", "18–30"],
+            ["Region", "Mumbai"],
+            ["Language", "Hinglish"],
+          ].map(([label, value]) => (
+            <div className="rounded-xl bg-bg p-3.5" key={label}>
+              <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-muted">{label}</p>
+              <p className="mt-2 text-sm font-semibold">{value}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 rounded-xl border border-border bg-bg/70 p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">Panel composition</p>
+            <p className="font-mono text-[9px] text-muted">Structured distribution</p>
+          </div>
+          <div className="mt-4 space-y-3">
+            {[
+              ["Existing customers", "42%", "42%", "var(--primary)"],
+              ["Category aware", "35%", "35%", "var(--warning)"],
+              ["New to category", "23%", "23%", "var(--accent)"],
+            ].map(([label, value, width, color], index) => (
+              <div key={label}>
+                <div className="flex justify-between text-xs text-muted"><span>{label}</span><span>{value}</span></div>
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-light">
+                  <span className="how-fill block h-full rounded-full" style={{ "--fill-delay": `${index * 120}ms`, backgroundColor: color, width }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "creative") {
+    return (
+      <div aria-label="Creative comparison example" className="how-visual rounded-2xl border border-border bg-surface p-5 shadow-xl shadow-black/6 sm:p-7">
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.17em] text-primary">Creative Genome</p>
+            <p className="mt-1 text-lg font-semibold">A/B audio comparison</p>
+          </div>
+          <span className="font-mono text-[9px] text-muted">2 files</span>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          {[
+            ["Creative A", creativeA.slice(0, 20), "var(--warning)", "CTA @ 24s"],
+            ["Creative B", creativeB.slice(0, 20), "var(--primary)", "CTA @ 17s"],
+          ].map(([label, bars, color, detail]) => (
+            <div className="rounded-xl border border-border bg-bg/70 p-4" key={label}>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold">{label}</p>
+                <span className="font-mono text-[8px] text-muted">0:30</span>
+              </div>
+              <Waveform bars={bars} color={color} />
+              <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">{detail}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {["Direct hook", "Warm voice", "Fast pacing", "Offer-led", "Music bed"].map((item) => (
+            <span className="rounded-full border border-border bg-bg px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.1em] text-muted" key={item}>{item}</span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "signal") {
+    return (
+      <div aria-label="Pre-market signal example" className="how-visual rounded-2xl border border-border bg-surface p-5 shadow-xl shadow-black/6 sm:p-7">
+        <div className="flex items-start justify-between gap-5">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.17em] text-primary">Synthetic prediction</p>
+            <p className="mt-2 text-2xl font-semibold">Creative B leads</p>
+            <p className="mt-1 text-sm text-muted">Value is understood earlier</p>
+          </div>
+          <div className="text-right">
+            <p className="text-4xl font-semibold text-primary">67%</p>
+            <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">Panel preference</p>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {[
+            ["Message clarity", "+18%", "var(--primary)"],
+            ["Offer recall", "+11%", "var(--warning)"],
+            ["Skip likelihood", "−14%", "var(--accent)"],
+          ].map(([label, value, color]) => (
+            <div className="rounded-xl bg-bg p-4" key={label}>
+              <span className="block size-2 rounded-full" style={{ backgroundColor: color }} />
+              <p className="mt-4 text-xl font-semibold">{value}</p>
+              <p className="mt-1 text-xs leading-5 text-muted">{label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-warning/30 bg-warning/6 px-4 py-3">
+          <span className="text-sm text-muted">Prediction confidence</span>
+          <span className="rounded-full border border-warning/35 px-3 py-1 font-mono text-[8px] uppercase tracking-[0.12em] text-warning">Medium</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div aria-label="Campaign calibration example" className="how-visual rounded-2xl border border-border bg-surface p-5 shadow-xl shadow-black/6 sm:p-7">
+      <div className="flex items-center justify-between border-b border-border pb-4">
+        <div>
+          <p className="font-mono text-[9px] uppercase tracking-[0.17em] text-primary">Learning event</p>
+          <p className="mt-1 text-lg font-semibold">Prediction meets reality</p>
+        </div>
+        <span className="rounded-full bg-success/10 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.12em] text-success">Correct direction</span>
+      </div>
+      <div className="mt-5 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <div className="rounded-xl bg-bg p-4">
+          <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">Prediction</p>
+          <p className="mt-3 text-xl font-semibold">B · 67%</p>
+          <p className="mt-1 text-xs text-muted">Synthetic preference</p>
+        </div>
+        <ArrowIcon />
+        <div className="rounded-xl bg-bg p-4">
+          <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">Reality</p>
+          <p className="mt-3 text-xl font-semibold text-success">B · +29.8%</p>
+          <p className="mt-1 text-xs text-muted">Observed CTR lift</p>
+        </div>
+      </div>
+      <div className="mt-4 rounded-xl border border-primary/25 bg-primary/6 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-primary">Campaign model</p>
+            <p className="mt-1 text-sm font-medium">Intent signal recalibrated</p>
+          </div>
+          <span className="font-mono text-xs font-semibold text-primary">v3 → v4</span>
         </div>
       </div>
     </div>
@@ -529,7 +725,7 @@ function Home() {
 
             <div
               className="mx-auto mt-5 grid max-w-330 overflow-hidden rounded-2xl border border-border bg-surface sm:grid-cols-2 lg:grid-cols-4"
-              id="how-it-works"
+              id="workflow-overview"
             >
               {workflow.map((item, index) => (
                 <div
@@ -931,6 +1127,86 @@ function Home() {
                 </p>
               </div>
               <span className="h-px flex-1 bg-linear-to-l from-transparent to-warning/50" />
+            </div>
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden border-t border-border bg-surface" id="how-it-works">
+          <div
+            aria-hidden="true"
+            className="absolute inset-x-0 top-0 h-120 opacity-30"
+            style={{
+              background:
+                "radial-gradient(ellipse at 18% 0%, color-mix(in srgb, var(--warning) 18%, transparent), transparent 55%)",
+            }}
+          />
+          <div className="relative mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-30 lg:px-12 lg:py-36">
+            <div className="grid gap-10 border-b border-border pb-14 lg:grid-cols-12 lg:items-end">
+              <div className="scroll-reveal lg:col-span-7">
+                <p className="font-mono text-xs font-medium uppercase tracking-[0.26em] text-primary">
+                  How it works
+                </p>
+                <h2 className="mt-6 max-w-205 text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-balance sm:text-5xl lg:text-6xl">
+                  From an idea to a smarter next experiment.
+                </h2>
+              </div>
+              <div className="scroll-reveal lg:col-span-5">
+                <p className="max-w-145 text-base leading-7 text-muted sm:text-lg sm:leading-8">
+                  Audio 90 adds a measurable learning layer before and after launch.
+                  Synthetic feedback shapes the hypothesis; real campaign behavior
+                  remains the source of truth.
+                </p>
+                <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.17em] text-muted">
+                  Define · Compare · Predict · Calibrate
+                </p>
+              </div>
+            </div>
+
+            <div className="divide-y divide-border">
+              {howSteps.map((step, index) => (
+                <article
+                  className="how-step grid gap-10 py-16 first:pt-16 sm:py-20 lg:grid-cols-12 lg:items-center lg:gap-18"
+                  key={step.number}
+                >
+                  <div className={`order-2 scroll-reveal lg:col-span-7 ${index % 2 === 0 ? "lg:order-1" : "lg:order-2"}`}>
+                    <HowVisual type={step.type} />
+                  </div>
+
+                  <div className={`order-1 scroll-reveal lg:col-span-5 ${index % 2 === 0 ? "lg:order-2" : "lg:order-1"}`}>
+                    <div className="flex items-center gap-4">
+                      <span className="grid size-11 place-items-center rounded-full border border-primary/40 font-mono text-[10px] text-primary">
+                        {step.number}
+                      </span>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.19em] text-primary">
+                        {step.eyebrow}
+                      </p>
+                    </div>
+                    <h3 className="mt-7 text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-balance sm:text-4xl">
+                      {step.title}
+                    </h3>
+                    <p className="mt-5 text-base leading-7 text-muted">
+                      {step.description}
+                    </p>
+                    <div className="mt-7 space-y-3">
+                      {step.points.map((point) => (
+                        <div className="flex items-center gap-3" key={point}>
+                          <span className="grid size-5 place-items-center rounded-full bg-primary/10 text-primary">
+                            <svg aria-hidden="true" className="size-3" fill="none" viewBox="0 0 12 12">
+                              <path d="m3 6 2 2 4-4" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" />
+                            </svg>
+                          </span>
+                          <span className="text-sm font-medium">{point}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-8 border-l-2 border-warning pl-4">
+                      <p className="font-mono text-[9px] uppercase tracking-[0.15em] text-muted">
+                        {step.note}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </section>

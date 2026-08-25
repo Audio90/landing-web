@@ -401,6 +401,24 @@ a {
   animation: lab-person-signal 2.8s ease-in-out var(--person-delay, 0ms) infinite;
 }
 
+.how-visual {
+  transition:
+    border-color 350ms ease,
+    box-shadow 350ms ease,
+    transform 350ms ease;
+}
+
+.how-visual:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
+  box-shadow: 0 28px 70px -42px color-mix(in srgb, var(--primary) 35%, transparent);
+  transform: translateY(-4px);
+}
+
+.how-fill {
+  animation: metric-grow 850ms cubic-bezier(0.22, 1, 0.36, 1) var(--fill-delay, 0ms) both;
+  transform-origin: left;
+}
+
 .solution-node,
 .lab-stage {
   animation: reveal-up 650ms cubic-bezier(0.22, 1, 0.36, 1) var(--node-delay, 0ms) both;
