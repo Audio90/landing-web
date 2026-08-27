@@ -17,22 +17,22 @@
 }
 
 :root {
-  --bg: #f5f1e8;
+  --bg: #f2efe7;
   --surface: #fffdf8;
-  --surface-light: #ebe6dc;
-  --text: #1c2722;
-  --muted: #667069;
-  --primary: #285c46;
-  --primary-hover: #1f4938;
+  --surface-light: #e9e5dc;
+  --text: #11130f;
+  --muted: #5f655e;
+  --primary: #205b43;
+  --primary-hover: #164632;
   --on-primary: #fffdf8;
-  --accent: #c75d3e;
-  --warning: #b37b2c;
-  --success: #3b7950;
-  --error: #b94c53;
-  --border: #d8d1c5;
+  --accent: #ff6035;
+  --warning: #b9781e;
+  --success: #2f7650;
+  --error: #bd4650;
+  --border: #cec8bc;
   --font-sans: Inter, Geist, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", Baskerville, "Times New Roman", serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-
   color: var(--text);
   background: var(--bg);
   font-family: var(--font-sans);
@@ -42,484 +42,147 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--bg); }
+button, a { -webkit-tap-highlight-color: transparent; }
+button, input, textarea, select { font: inherit; }
+a { text-decoration: none; }
+::selection { color: var(--on-primary); background: var(--primary); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+
+.hero-grid {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border) 28%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border) 28%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, black, black 84%, transparent);
+  opacity: 0.58;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  min-width: 320px;
-  min-height: 100vh;
-  margin: 0;
-  background: var(--bg);
-}
-
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
-}
-
-a {
-  text-decoration: none;
-}
-
-::selection {
-  color: var(--on-primary);
-  background: var(--primary);
-}
-
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 3px;
-}
-
-@keyframes reveal-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes panel-enter {
-  from {
-    opacity: 0;
-    transform: translateY(44px) scale(0.985);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes grid-drift {
-  to {
-    background-position: 72px 72px;
-  }
-}
-
-@keyframes glow-breathe {
-  0%,
-  100% {
-    opacity: 0.18;
-    scale: 0.94;
-  }
-
-  50% {
-    opacity: 0.3;
-    scale: 1.06;
-  }
+@keyframes hero-enter {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes waveform-pulse {
-  0%,
-  100% {
-    transform: scaleY(0.66);
-  }
-
-  50% {
-    transform: scaleY(1);
-  }
+  0%, 100% { transform: scaleY(0.72); }
+  50% { transform: scaleY(1); }
 }
 
 @keyframes data-grow {
-  from {
-    opacity: 0;
-    transform: scaleY(0.12);
-  }
-
-  to {
-    transform: scaleY(1);
-  }
+  from { opacity: 0; transform: scaleY(0.12); }
+  to { opacity: 1; transform: scaleY(1); }
 }
 
 @keyframes audience-signal {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 transparent;
-    transform: scale(1);
-  }
-
-  50% {
-    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent);
-    transform: scale(1.08);
-  }
+  0%, 100% { transform: scale(0.86); }
+  50% { transform: scale(1); }
 }
 
 @keyframes ring-enter {
-  from {
-    opacity: 0;
-    transform: rotate(-65deg) scale(0.82);
-  }
-
-  to {
-    opacity: 1;
-    transform: rotate(0) scale(1);
-  }
+  from { opacity: 0; transform: rotate(-55deg) scale(0.88); }
+  to { opacity: 1; transform: rotate(0) scale(1); }
 }
 
 @keyframes metric-grow {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@keyframes problem-scan {
-  from {
-    left: 0;
-  }
-
-  to {
-    left: calc(100% - 0.5rem);
-  }
-}
-
-@keyframes orbit-turn {
-  to {
-    rotate: 360deg;
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 @keyframes connector-drift {
-  to {
-    stroke-dashoffset: -44;
-  }
+  to { stroke-dashoffset: -38; }
 }
 
-@keyframes lab-breathe {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 10%, transparent);
-  }
-
-  50% {
-    box-shadow: 0 0 0 10px transparent;
-  }
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--success) 24%, transparent); }
+  50% { box-shadow: 0 0 0 5px transparent; }
 }
 
-@keyframes lab-person-signal {
-  0%,
-  100% {
-    scale: 0.78;
-  }
+.hero-serif { font-family: var(--font-serif); }
+.hero-report { filter: drop-shadow(0 34px 42px color-mix(in srgb, var(--text) 10%, transparent)); }
+.calibration-panel { box-shadow: 0 34px 70px -54px color-mix(in srgb, var(--text) 50%, transparent); }
 
-  50% {
-    opacity: 1;
-    scale: 1;
-  }
-}
+.hero-item { animation: hero-enter 820ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.hero-item:nth-child(2) { animation-delay: 80ms; }
+.hero-item:nth-child(3) { animation-delay: 150ms; }
+.hero-item:nth-child(4) { animation-delay: 220ms; }
 
-@keyframes lab-status-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 38%, transparent);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px transparent;
-  }
-}
-
-.motion-reveal {
-  animation: reveal-up 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms) both;
-}
-
-.motion-panel {
-  animation: panel-enter 1000ms cubic-bezier(0.22, 1, 0.36, 1) 480ms both;
-}
-
-.motion-grid {
-  animation: grid-drift 24s linear infinite;
-}
-
-.motion-glow {
-  animation: glow-breathe 8s ease-in-out infinite;
-}
-
-.mockup-shell {
+.mockup-shell,
+.connector-board {
   transition:
-    border-color 350ms ease,
-    box-shadow 350ms ease,
-    translate 350ms ease;
+    border-color 320ms ease,
+    box-shadow 320ms ease,
+    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mockup-shell:hover {
-  border-color: color-mix(in srgb, var(--primary) 38%, var(--border));
-  box-shadow:
-    0 28px 80px -38px color-mix(in srgb, var(--primary) 30%, transparent),
-    0 24px 50px -24px rgb(16 32 22 / 24%);
-  translate: 0 -4px;
+.mockup-shell:hover,
+.connector-board:hover {
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  box-shadow: 0 30px 85px -52px color-mix(in srgb, var(--primary) 42%, transparent);
+  transform: translateY(-3px);
 }
 
 .wave-bar {
-  animation: waveform-pulse ease-in-out infinite;
+  animation: waveform-pulse 1.8s ease-in-out var(--wave-delay, 0ms) infinite;
   transform-origin: center;
-  will-change: transform;
 }
 
 .distribution-bar {
-  animation: data-grow 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: data-grow 760ms cubic-bezier(0.16, 1, 0.3, 1) var(--bar-delay, 0ms) both;
+  transform-origin: bottom;
 }
 
 .audience-dot {
-  animation: audience-signal 3.2s ease-in-out infinite;
-  color: var(--primary);
+  animation: audience-signal 2.8s ease-in-out var(--dot-delay, 0ms) infinite;
 }
 
 .confidence-ring {
-  animation: ring-enter 900ms cubic-bezier(0.22, 1, 0.36, 1) 780ms both;
+  animation: ring-enter 900ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
 }
 
 .metric-bar {
-  animation: metric-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: metric-grow 850ms cubic-bezier(0.16, 1, 0.3, 1) 220ms both;
   transform-origin: left;
-}
-
-.workflow-card {
-  transition:
-    background-color 300ms ease,
-    translate 300ms ease;
-}
-
-.workflow-card:hover {
-  background: color-mix(in srgb, var(--surface-light) 68%, var(--surface));
-  translate: 0 -3px;
-}
-
-.problem-signal {
-  animation: problem-scan 3.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-}
-
-.problem-orbit {
-  animation: orbit-turn 28s linear infinite;
-  transform-origin: center;
-}
-
-.problem-orbit::before,
-.problem-orbit::after {
-  position: absolute;
-  border-radius: 999px;
-  content: "";
-}
-
-.problem-orbit::before {
-  inset: 12%;
-  border: 1px dashed color-mix(in srgb, var(--warning) 18%, transparent);
-}
-
-.problem-orbit::after {
-  top: 12%;
-  left: 50%;
-  width: 0.55rem;
-  height: 0.55rem;
-  background: var(--primary);
-  box-shadow: 0 0 24px var(--primary);
-  transform: translate(-50%, -50%);
 }
 
 .connector-base,
 .connector-flow {
+  fill: none;
   vector-effect: non-scaling-stroke;
 }
 
-.connector-base {
-  stroke: color-mix(in srgb, var(--muted) 28%, transparent);
-  stroke-width: 1;
-}
-
+.connector-base { stroke: color-mix(in srgb, var(--muted) 28%, transparent); stroke-width: 1; }
 .connector-flow {
-  animation: connector-drift 2.2s linear var(--connector-delay, 0ms) infinite;
-  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--primary) 55%, transparent));
+  animation: connector-drift 2.4s linear var(--connector-delay, 0ms) infinite;
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--primary) 38%, transparent));
   stroke: var(--primary);
-  stroke-dasharray: 3 16;
+  stroke-dasharray: 3 12;
   stroke-linecap: round;
-  stroke-width: 1.7;
+  stroke-width: 1.5;
 }
 
-.lab-core {
-  animation: lab-breathe 4.5s ease-in-out infinite;
-}
-
-.solution-halo {
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--primary) 12%, transparent),
-    transparent 67%
-  );
-  filter: blur(10px);
-}
-
-.lab-mark {
-  background-image: radial-gradient(
-    circle at 35% 25%,
-    color-mix(in srgb, var(--primary) 24%, transparent),
-    transparent 68%
-  );
-}
-
-.lab-status {
-  animation: lab-status-pulse 1.8s ease-out infinite;
-}
-
-.lab-person {
-  animation: lab-person-signal 2.8s ease-in-out var(--person-delay, 0ms) infinite;
-}
-
-.how-visual {
+.connector-card {
   transition:
-    border-color 350ms ease,
-    box-shadow 350ms ease,
-    transform 350ms ease;
+    border-color 280ms ease,
+    box-shadow 280ms ease,
+    transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.how-visual:hover {
-  border-color: color-mix(in srgb, var(--primary) 35%, var(--border));
-  box-shadow: 0 28px 70px -42px color-mix(in srgb, var(--primary) 35%, transparent);
-  transform: translateY(-4px);
-}
-
-.how-fill {
-  animation: metric-grow 850ms cubic-bezier(0.22, 1, 0.36, 1) var(--fill-delay, 0ms) both;
-  transform-origin: left;
-}
-
-.research-workbench {
-  transition:
-    border-color 350ms ease,
-    box-shadow 350ms ease;
-}
-
-.research-workbench:hover {
-  border-color: color-mix(in srgb, var(--primary) 32%, var(--border));
-  box-shadow: 0 32px 90px -52px color-mix(in srgb, var(--primary) 38%, transparent);
-}
-
-.uncertainty-bar {
-  animation: data-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--bar-delay, 0ms) both;
-  transform-origin: bottom;
-}
-
-.research-principle {
-  transition:
-    background-color 300ms ease,
-    transform 300ms ease;
-}
-
-.research-principle:hover {
-  background: color-mix(in srgb, var(--surface-light) 58%, var(--surface));
-  transform: translateY(-3px);
-}
-
-.feedback-console {
-  transition:
-    border-color 350ms ease,
-    box-shadow 350ms ease;
-}
-
-.feedback-console:hover {
-  border-color: color-mix(in srgb, var(--primary) 34%, var(--border));
-  box-shadow: 0 34px 90px -54px color-mix(in srgb, var(--primary) 40%, transparent);
-}
-
-.feedback-transfer {
-  animation: feedback-pulse 2.4s ease-in-out infinite;
-}
-
-.campaign-row {
-  transition: background-color 250ms ease;
-}
-
-.campaign-row:hover {
-  background: color-mix(in srgb, var(--surface-light) 45%, transparent);
-}
-
-.calibration-fill {
-  animation: metric-grow 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
-  transform-origin: left;
-}
-
-.learning-step {
-  transition:
-    background-color 300ms ease,
-    transform 300ms ease;
-}
-
-.learning-step:hover {
-  background: var(--surface);
-  transform: translateY(-3px);
-}
-
-.outcome-card {
-  transition:
-    border-color 320ms ease,
-    box-shadow 320ms ease;
-}
-
-.outcome-card:hover {
+.connector-card:hover {
   border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
-  box-shadow: 0 26px 65px -46px color-mix(in srgb, var(--primary) 38%, transparent);
+  box-shadow: 0 18px 35px -28px color-mix(in srgb, var(--primary) 44%, transparent);
+  transform: translateY(-2px);
 }
 
-.outcome-fill {
-  animation: metric-grow 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  transform-origin: left;
-}
+.lab-mark { background-image: radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--primary) 22%, transparent), transparent 68%); }
+.lab-status { animation: status-pulse 1.8s ease-in-out infinite; }
+.step-card { transition: background-color 280ms ease; }
+.step-card:hover { background: color-mix(in srgb, var(--surface-light) 50%, var(--surface)); }
 
-@keyframes feedback-pulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 0%, transparent);
-    transform: translateX(0);
-  }
-
-  50% {
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 8%, transparent);
-    transform: translateX(3px);
-  }
-}
-
-@media (width < 80rem) {
-  .solution-column {
-    padding-left: 1.25rem;
-  }
-
-  .solution-column::before {
-    position: absolute;
-    top: 2.4rem;
-    bottom: 0.5rem;
-    left: 0.3rem;
-    width: 1px;
-    background: linear-gradient(transparent, var(--primary), var(--border), var(--accent), transparent);
-    content: "";
-  }
-}
-
-.reveal-ready .scroll-reveal,
-.reveal-ready .problem-step,
-.reveal-ready .question-row,
-.reveal-ready .solution-node,
-.reveal-ready .lab-stage {
+.reveal-ready .reveal {
   opacity: 0;
-  transform: translate3d(0, 18px, 0) scale(0.996);
+  transform: translate3d(0, 18px, 0) scale(0.997);
   transition:
     opacity 360ms ease-out,
     transform 420ms cubic-bezier(0.4, 0, 0.6, 1);
@@ -527,91 +190,16 @@ a {
   backface-visibility: hidden;
 }
 
-.reveal-ready .scroll-reveal.is-visible,
-.reveal-ready .problem-step.is-visible,
-.reveal-ready .question-row.is-visible,
-.reveal-ready .solution-node.is-visible,
-.reveal-ready .lab-stage.is-visible {
+.reveal-ready .reveal.is-visible {
   opacity: 1;
   transform: translate3d(0, 0, 0) scale(1);
   transition-duration: 760ms, 900ms;
-  transition-timing-function:
-    cubic-bezier(0.16, 1, 0.3, 1),
-    cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.reveal-ready .scroll-reveal.is-visible {
-  transition-delay: var(--reveal-delay, 0ms);
-}
-
-.reveal-ready .problem-step.is-visible {
-  transition-delay: var(--step-delay, 0ms);
-}
-
-.reveal-ready .question-row.is-visible {
-  transition-delay: var(--question-delay, 0ms);
-}
-
-.reveal-ready .solution-node.is-visible {
-  transition-delay: var(--node-delay, 0ms);
-}
-
-.reveal-ready .lab-stage.is-visible {
-  transition-delay: var(--stage-delay, 0ms);
-}
-
-.reveal-ready .research-principle.is-visible:hover,
-.reveal-ready .learning-step.is-visible:hover {
-  transform: translate3d(0, -3px, 0);
-}
-
-.reveal-ready .solution-node.is-visible:hover {
-  transform: translate3d(0, -4px, 0);
-}
-
-.reveal-ready .uncertainty-bar,
-.reveal-ready .calibration-fill,
-.reveal-ready .scroll-reveal .how-fill,
-.reveal-ready .outcome-fill {
-  animation: none;
-}
-
-.reveal-ready .research-workbench.is-visible .uncertainty-bar {
-  animation: data-grow 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--bar-delay, 0ms) both;
-}
-
-.reveal-ready .feedback-console.is-visible .calibration-fill {
-  animation: metric-grow 900ms cubic-bezier(0.22, 1, 0.36, 1) 180ms both;
-}
-
-.reveal-ready .scroll-reveal.is-visible .how-fill {
-  animation: metric-grow 850ms cubic-bezier(0.22, 1, 0.36, 1) var(--fill-delay, 0ms) both;
-}
-
-.reveal-ready .outcome-card.is-visible .outcome-fill {
-  animation: metric-grow 850ms cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  .scroll-reveal,
-  .problem-step,
-  .question-row,
-  .solution-node,
-  .lab-stage {
-    opacity: 1 !important;
-    filter: none !important;
-    transform: none !important;
-  }
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .reveal { opacity: 1 !important; transform: none !important; }
 }

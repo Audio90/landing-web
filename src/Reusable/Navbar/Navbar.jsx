@@ -2,9 +2,9 @@ import { useState } from "react";
 
 const navigation = [
   { label: "Product", href: "#product" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Research", href: "#research" },
-  { label: "About", href: "#about" },
+  { label: "Report", href: "#report" },
+  { label: "Method", href: "#method" },
+  { label: "Calibration", href: "#science" },
 ];
 
 function BrandMark() {
@@ -30,10 +30,10 @@ function Navbar() {
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] backdrop-blur-xl">
       <nav
         aria-label="Primary navigation"
-        className="mx-auto flex h-20 max-w-360 items-center justify-between px-5 sm:px-8 lg:px-12"
+        className="mx-auto flex h-18 max-w-360 items-center justify-between px-5 sm:px-8 lg:px-12"
       >
         <a
           aria-label="Audio 90 home"
@@ -61,10 +61,10 @@ function Navbar() {
 
         <div className="hidden lg:block">
           <a
-            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-primary px-5 text-sm font-semibold text-primary transition-colors duration-200 hover:bg-primary hover:text-on-primary"
+            className="inline-flex min-h-11 items-center justify-center bg-text px-5 text-sm font-semibold text-surface transition-transform duration-200 hover:-translate-y-0.5"
             href="#beta"
           >
-            Join Beta
+            Request access
           </a>
         </div>
 
@@ -72,7 +72,7 @@ function Navbar() {
           aria-controls="mobile-navigation"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close navigation" : "Open navigation"}
-          className="grid size-11 place-items-center rounded-lg border border-border text-text transition-colors hover:border-primary lg:hidden"
+          className="grid size-11 place-items-center border border-border text-text transition-colors hover:border-text lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -107,7 +107,7 @@ function Navbar() {
           <div className="mx-auto flex max-w-360 flex-col gap-1">
             {navigation.map((item) => (
               <a
-                className="rounded-lg px-4 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-text"
+                className="px-4 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-text"
                 href={item.href}
                 key={item.label}
                 onClick={closeMenu}
@@ -116,11 +116,11 @@ function Navbar() {
               </a>
             ))}
             <a
-              className="mt-3 inline-flex min-h-12 items-center justify-center rounded-lg bg-primary px-5 font-semibold text-on-primary"
+              className="mt-3 inline-flex min-h-12 items-center justify-center bg-text px-5 font-semibold text-surface"
               href="#beta"
               onClick={closeMenu}
             >
-              Join Beta
+              Request access
             </a>
           </div>
         </div>
