@@ -65,6 +65,11 @@ a { text-decoration: none; }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes report-view-enter {
+  from { opacity: 0.3; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes waveform-pulse {
   0%, 100% { transform: scaleY(0.72); }
   50% { transform: scaleY(1); }
@@ -102,6 +107,8 @@ a { text-decoration: none; }
 .hero-serif { font-family: var(--font-serif); }
 .hero-report { filter: drop-shadow(0 34px 42px color-mix(in srgb, var(--text) 10%, transparent)); }
 .calibration-panel { box-shadow: 0 34px 70px -54px color-mix(in srgb, var(--text) 50%, transparent); }
+.report-panel { animation: report-view-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.report-tab:focus-visible { outline-offset: -4px; }
 
 .hero-item { animation: hero-enter 820ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 .hero-item:nth-child(2) { animation-delay: 80ms; }
@@ -196,6 +203,10 @@ a { text-decoration: none; }
   transition-duration: 760ms, 900ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1), cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: var(--delay, 0ms);
+}
+
+@media (min-width: 1024px) {
+  .report-panel { min-height: 31.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
