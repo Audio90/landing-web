@@ -866,7 +866,7 @@ function Home() {
             <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-8">
                 <p className="hero-item font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
-                  Synthetic audience testing for audio advertising
+                  Hear the signal before you spend.
                 </p>
                 <h1 className="hero-item mt-6 text-5xl font-semibold leading-[0.89] tracking-[-0.068em] text-balance sm:text-7xl lg:text-[6.3rem]">
                   Test the ad.{" "}
@@ -877,16 +877,15 @@ function Home() {
               </div>
               <div className="hero-item lg:col-span-4 lg:pb-2">
                 <p className="max-w-120 text-base leading-7 text-muted sm:text-lg sm:leading-8">
-                  Audio 90 compares two audio creatives with a synthetic
-                  audience, explains which direction leads, and shows how
-                  certain the signal is.
+                  Compare two audio ads with a synthetic audience. See which
+                  leads—and why.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
                   <a
                     className="group inline-flex min-h-13 items-center justify-center gap-2 bg-text px-4 text-sm font-semibold text-surface transition-transform hover:-translate-y-0.5"
-                    href="#beta"
+                    href="#waitlist"
                   >
-                    Request beta access <ArrowIcon />
+                    Join the waitlist <ArrowIcon />
                   </a>
                   <a
                     className="inline-flex min-h-13 items-center justify-center border border-text/25 bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-light"
@@ -896,14 +895,14 @@ function Home() {
                   </a>
                 </div>
                 <p className="mt-6 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
-                  Compare · explain · calibrate
+                  Compare · understand · decide
                 </p>
               </div>
             </div>
 
             <div className="hero-report relative mt-16" id="report">
               <div className="mb-3 flex items-center justify-between border-y border-border py-3 font-mono text-[8px] uppercase tracking-[0.14em] text-muted">
-                <span>Live product surface</span>
+                <span>Product concept preview</span>
                 <span>Example experiment · A90-024</span>
               </div>
               <ExperimentDashboard />
@@ -950,8 +949,7 @@ function Home() {
                 </h2>
               </div>
               <p className="max-w-125 text-base leading-7 text-muted lg:col-span-4">
-                Audience, creative and campaign context go in. Direction,
-                reasoning and honest uncertainty come out.
+                Three inputs become one explainable signal.
               </p>
             </div>
             <div className="mt-14">
@@ -974,8 +972,7 @@ function Home() {
                   </span>
                 </h2>
                 <p className="mt-7 max-w-115 text-base leading-7 text-text/75">
-                  Return the real campaign outcome. Audio 90 measures the miss
-                  and recalibrates the next comparable test.
+                  Real campaign results recalibrate the next test.
                 </p>
               </div>
               <div className="bg-surface p-6 sm:p-10 lg:col-span-7 lg:p-12">
@@ -1025,27 +1022,26 @@ function Home() {
           </div>
         </section>
 
-        <section className="bg-surface" id="beta">
+        <section className="bg-surface" id="waitlist">
           <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-28 lg:px-12">
             <div className="reveal grid gap-8 border-y border-text/20 py-12 lg:grid-cols-12 lg:items-end lg:py-18">
               <div className="lg:col-span-8">
                 <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
-                  Audio 90 private beta
+                  Audio 90 waitlist
                 </p>
                 <h2 className="mt-5 max-w-225 text-4xl font-semibold leading-[0.96] tracking-[-0.055em] text-balance sm:text-6xl lg:text-7xl">
-                  Bring the two ads you cannot choose between.
+                  Two ads in. One smarter first test out.
                 </h2>
               </div>
               <div className="lg:col-span-4">
                 <p className="text-base leading-7 text-muted">
-                  Leave with a clearer first test—not a promise, a
-                  better-supported decision.
+                  Would you use this before buying media? Join the waitlist.
                 </p>
                 <a
                   className="group mt-7 inline-flex min-h-13 items-center justify-center gap-2 bg-text px-7 text-sm font-semibold text-surface transition-transform hover:-translate-y-0.5"
-                  href="#top"
+                  href="#waitlist"
                 >
-                  Request beta access <ArrowIcon />
+                  Join the waitlist <ArrowIcon />
                 </a>
               </div>
             </div>
@@ -1059,7 +1055,7 @@ function Home() {
             Audio <span className="text-primary">90</span>
           </p>
           <p className="text-xs text-muted">
-            Synthetic audience testing for better audio advertising decisions.
+            Pre-market signals for audio creative.
           </p>
           <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
             Estimate · validate · learn

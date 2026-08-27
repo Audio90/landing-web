@@ -62,9 +62,9 @@ function Navbar() {
         <div className="hidden lg:block">
           <a
             className="inline-flex min-h-11 items-center justify-center bg-text px-5 text-sm font-semibold text-surface transition-transform duration-200 hover:-translate-y-0.5"
-            href="#beta"
+            href="#waitlist"
           >
-            Request access
+            Join waitlist
           </a>
         </div>
 
@@ -117,10 +117,10 @@ function Navbar() {
             ))}
             <a
               className="mt-3 inline-flex min-h-12 items-center justify-center bg-text px-5 font-semibold text-surface"
-              href="#beta"
+              href="#waitlist"
               onClick={closeMenu}
             >
-              Request access
+              Join waitlist
             </a>
           </div>
         </div>
