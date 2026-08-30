@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navigation = [
   { label: "Product", href: "#product" },
@@ -26,11 +26,38 @@ function BrandMark() {
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeHref, setActiveHref] = useState("#product");
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const closeMenu = () => setIsOpen(false);
 
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0);
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (visible) setActiveHref(`#${visible.target.id}`);
+      },
+      { rootMargin: "-22% 0px -68% 0px", threshold: 0 },
+    );
+
+    navigation.forEach(({ href }) => {
+      const section = document.querySelector(href);
+      if (section) observer.observe(section);
+    });
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    updateProgress();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updateProgress);
+    };
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] backdrop-blur-xl">
       <nav
         aria-label="Primary navigation"
         className="mx-auto flex h-18 max-w-360 items-center justify-between px-5 sm:px-8 lg:px-12"
@@ -50,7 +77,8 @@ function Navbar() {
         <div className="hidden items-center gap-9 lg:flex">
           {navigation.map((item) => (
             <a
-              className="text-sm font-medium text-muted transition-colors duration-200 hover:text-text focus-visible:text-text"
+              aria-current={activeHref === item.href ? "location" : undefined}
+              className={`text-sm font-medium transition-colors duration-200 hover:text-text focus-visible:text-text ${activeHref === item.href ? "nav-link-active" : "text-muted"}`}
               href={item.href}
               key={item.label}
             >
@@ -106,8 +134,9 @@ function Navbar() {
         >
           <div className="mx-auto flex max-w-360 flex-col gap-1">
             {navigation.map((item) => (
-              <a
-                className="px-4 py-3 text-base font-medium text-muted transition-colors hover:bg-surface hover:text-text"
+            <a
+                aria-current={activeHref === item.href ? "location" : undefined}
+                className={`border-l-2 px-4 py-3 text-base font-medium transition-colors hover:bg-surface hover:text-text ${activeHref === item.href ? "border-accent bg-surface text-text" : "border-transparent text-muted"}`}
                 href={item.href}
                 key={item.label}
                 onClick={closeMenu}
@@ -125,6 +154,11 @@ function Navbar() {
           </div>
         </div>
       )}
+      <span
+        aria-hidden="true"
+        className="scroll-progress absolute bottom-[-1px] left-0 h-0.5"
+        style={{ width: `${scrollProgress}%` }}
+      />
     </header>
   );
 }

@@ -966,6 +966,17 @@ function ExperimentDashboard() {
     results: ["View calibration", "calibration"],
     calibration: ["Back to experiment", "experiment"],
   };
+  const handleTabKey = (event) => {
+    if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowRight" ? 1 : -1;
+    const currentIndex = tabs.indexOf(activeTab);
+    const nextTab = tabs[(currentIndex + direction + tabs.length) % tabs.length];
+    setActiveTab(nextTab);
+    window.requestAnimationFrame(() =>
+      document.getElementById(`report-tab-${nextTab}`)?.focus(),
+    );
+  };
 
   return (
     <div className="mockup-shell reveal overflow-hidden rounded-xl border border-text/20 bg-surface shadow-2xl shadow-black/10">
@@ -988,6 +999,7 @@ function ExperimentDashboard() {
               id={`report-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
+              onKeyDown={handleTabKey}
               role="tab"
               type="button"
             >
@@ -1070,11 +1082,37 @@ function ProcessSection() {
 
 function UseCasesSection() {
   const roles = [
-    ["Brand teams", "Choose which message deserves the first media test."],
-    ["Agencies", "Give creative recommendations a documented rationale."],
-    ["Creative strategists", "Compare hooks, voices, offers, and calls to action."],
-    ["Media buyers", "Reduce uncertainty before committing paid reach."],
+    {
+      title: "Brand teams",
+      detail: "Choose which message deserves the first media test.",
+      decision: "Which creative best communicates the campaign promise?",
+      output: "A ranked direction with clarity, recall, and disagreement signals.",
+      tag: "Message fit",
+    },
+    {
+      title: "Agencies",
+      detail: "Give creative recommendations a documented rationale.",
+      decision: "Which route should move from presentation into paid media?",
+      output: "An explainable comparison to support the recommendation.",
+      tag: "Client rationale",
+    },
+    {
+      title: "Creative strategists",
+      detail: "Compare hooks, voices, offers, and calls to action.",
+      decision: "Which creative choice is most likely driving preference?",
+      output: "Attribute-level reasoning and visible audience disagreement.",
+      tag: "Creative learning",
+    },
+    {
+      title: "Media buyers",
+      detail: "Reduce uncertainty before committing paid reach.",
+      decision: "Which ad should receive the first controlled media test?",
+      output: "A directional hypothesis ready for an in-market validation plan.",
+      tag: "Test priority",
+    },
   ];
+  const [selectedRole, setSelectedRole] = useState(0);
+  const activeRole = roles[selectedRole];
 
   return (
     <section className="border-b border-border bg-surface" id="use-cases">
@@ -1092,13 +1130,38 @@ function UseCasesSection() {
               digital radio, and traditional radio spots.
             </p>
           </div>
-          <div className="grid gap-px border border-border bg-border sm:grid-cols-2 lg:col-span-7">
-            {roles.map(([title, detail]) => (
-              <article className="bg-bg p-6 sm:p-7" key={title}>
-                <h3 className="text-lg font-semibold">{title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
-              </article>
-            ))}
+          <div className="lg:col-span-7">
+            <div className="grid gap-px border border-border bg-border sm:grid-cols-2">
+              {roles.map((role, index) => (
+                <button
+                  aria-pressed={selectedRole === index}
+                  className={`min-h-35 cursor-pointer p-6 text-left transition-colors sm:p-7 ${selectedRole === index ? "bg-primary text-on-primary" : "bg-bg hover:bg-surface-light"}`}
+                  key={role.title}
+                  onClick={() => setSelectedRole(index)}
+                  type="button"
+                >
+                  <span className={`font-mono text-[8px] uppercase tracking-[0.12em] ${selectedRole === index ? "text-on-primary/70" : "text-accent"}`}>
+                    {role.tag}
+                  </span>
+                  <span className="mt-3 block text-lg font-semibold">{role.title}</span>
+                  <span className={`mt-2 block text-sm leading-6 ${selectedRole === index ? "text-on-primary/75" : "text-muted"}`}>
+                    {role.detail}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="use-case-panel mt-3 border border-primary/25 bg-primary/6 p-6 sm:p-7" key={activeRole.title}>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-primary">Decision</p>
+                  <p className="mt-3 text-base font-semibold leading-6">{activeRole.decision}</p>
+                </div>
+                <div>
+                  <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-primary">Pilot output</p>
+                  <p className="mt-3 text-sm leading-6 text-muted">{activeRole.output}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1285,6 +1348,21 @@ function Home() {
         <section
           className="relative isolate overflow-hidden border-b border-border"
           id="product"
+          onPointerLeave={(event) => {
+            event.currentTarget.style.removeProperty("--pointer-x");
+            event.currentTarget.style.removeProperty("--pointer-y");
+          }}
+          onPointerMove={(event) => {
+            const bounds = event.currentTarget.getBoundingClientRect();
+            event.currentTarget.style.setProperty(
+              "--pointer-x",
+              `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
+            );
+            event.currentTarget.style.setProperty(
+              "--pointer-y",
+              `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
+            );
+          }}
         >
           <div
             aria-hidden="true"
