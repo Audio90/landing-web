@@ -45,6 +45,7 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--bg); }
+section[id] { scroll-margin-top: 4.5rem; }
 button, a { -webkit-tap-highlight-color: transparent; }
 button, input, textarea, select { font: inherit; }
 a { text-decoration: none; }
@@ -134,6 +135,8 @@ a { text-decoration: none; }
   animation: waveform-pulse 1.8s ease-in-out var(--wave-delay, 0ms) infinite;
   transform-origin: center;
 }
+
+.audio-row:not(.is-playing) .wave-bar { animation-play-state: paused; }
 
 .distribution-bar {
   animation: data-grow 760ms cubic-bezier(0.16, 1, 0.3, 1) var(--bar-delay, 0ms) both;

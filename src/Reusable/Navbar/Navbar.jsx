@@ -2,9 +2,9 @@ import { useState } from "react";
 
 const navigation = [
   { label: "Product", href: "#product" },
-  { label: "Report", href: "#report" },
-  { label: "Method", href: "#method" },
-  { label: "Calibration", href: "#science" },
+  { label: "Audio demo", href: "#demo" },
+  { label: "Sample report", href: "#report" },
+  { label: "Methodology", href: "#methodology" },
 ];
 
 function BrandMark() {
@@ -62,9 +62,9 @@ function Navbar() {
         <div className="hidden lg:block">
           <a
             className="inline-flex min-h-11 items-center justify-center bg-text px-5 text-sm font-semibold text-surface transition-transform duration-200 hover:-translate-y-0.5"
-            href="#waitlist"
+            href="#pilot"
           >
-            Join waitlist
+            Request an early test
           </a>
         </div>
 
@@ -117,10 +117,10 @@ function Navbar() {
             ))}
             <a
               className="mt-3 inline-flex min-h-12 items-center justify-center bg-text px-5 font-semibold text-surface"
-              href="#waitlist"
+              href="#pilot"
               onClick={closeMenu}
             >
-              Join waitlist
+              Request an early test
             </a>
           </div>
         </div>
