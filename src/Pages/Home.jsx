@@ -30,76 +30,339 @@ function ArrowIcon() {
   );
 }
 
-function SignalScene() {
-  const updateTilt = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    event.currentTarget.style.setProperty("--scene-rotate-y", `${x * 12}deg`);
-    event.currentTarget.style.setProperty("--scene-rotate-x", `${y * -10}deg`);
-  };
+function SignalCanvas({ phase }) {
+  const canvasRef = useRef(null);
 
-  const resetTilt = (event) => {
-    event.currentTarget.style.removeProperty("--scene-rotate-x");
-    event.currentTarget.style.removeProperty("--scene-rotate-y");
-  };
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = canvas.parentElement;
+    const context = canvas.getContext("2d");
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const styles = getComputedStyle(document.documentElement);
+    const signal = styles.getPropertyValue("--signal").trim();
+    const primary = styles.getPropertyValue("--primary").trim();
+    const pointer = { x: 0.5, y: 0.5 };
+    let width = 0;
+    let height = 0;
+    let frame;
+    let isVisible = true;
+    let isRunning = false;
+
+    const cubicPoint = (path, progress) => {
+      const inverse = 1 - progress;
+      return {
+        x:
+          inverse ** 3 * path[0].x +
+          3 * inverse ** 2 * progress * path[1].x +
+          3 * inverse * progress ** 2 * path[2].x +
+          progress ** 3 * path[3].x,
+        y:
+          inverse ** 3 * path[0].y +
+          3 * inverse ** 2 * progress * path[1].y +
+          3 * inverse * progress ** 2 * path[2].y +
+          progress ** 3 * path[3].y,
+      };
+    };
+
+    const resize = () => {
+      const bounds = container.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
+      width = bounds.width;
+      height = bounds.height;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const draw = (timestamp = 0) => {
+      if (!width || !height) return;
+      const time = reducedMotion ? 0 : timestamp;
+      const shiftX = (pointer.x - 0.5) * 14;
+      const shiftY = (pointer.y - 0.5) * 10;
+      const nodes = {
+        a: { x: width * 0.15 + shiftX * 0.2, y: height * 0.32 + shiftY * 0.2 },
+        b: { x: width * 0.15 - shiftX * 0.15, y: height * 0.7 - shiftY * 0.15 },
+        audience: { x: width * 0.52 + shiftX * 0.55, y: height * 0.51 + shiftY * 0.5 },
+        result: { x: width * 0.84 + shiftX * 0.25, y: height * 0.51 + shiftY * 0.25 },
+      };
+      const paths = [
+        [
+          nodes.a,
+          { x: width * 0.3, y: nodes.a.y },
+          { x: width * 0.38, y: nodes.audience.y - height * 0.09 },
+          nodes.audience,
+        ],
+        [
+          nodes.b,
+          { x: width * 0.3, y: nodes.b.y },
+          { x: width * 0.38, y: nodes.audience.y + height * 0.09 },
+          nodes.audience,
+        ],
+        [
+          nodes.audience,
+          { x: width * 0.64, y: nodes.audience.y },
+          { x: width * 0.72, y: nodes.result.y },
+          nodes.result,
+        ],
+      ];
+      const activePathCount = phase === "decide" ? 3 : 2;
+
+      context.clearRect(0, 0, width, height);
+      context.save();
+
+      context.strokeStyle = "rgba(201, 245, 122, 0.055)";
+      context.lineWidth = 1;
+      const gridSize = width < 420 ? 24 : 30;
+      const gridOffsetX = (shiftX * -0.45) % gridSize;
+      const gridOffsetY = (shiftY * -0.45) % gridSize;
+      for (let x = gridOffsetX; x < width; x += gridSize) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, height);
+        context.stroke();
+      }
+      for (let y = gridOffsetY; y < height; y += gridSize) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(width, y);
+        context.stroke();
+      }
+
+      paths.forEach((path, pathIndex) => {
+        context.beginPath();
+        context.moveTo(path[0].x, path[0].y);
+        context.bezierCurveTo(
+          path[1].x,
+          path[1].y,
+          path[2].x,
+          path[2].y,
+          path[3].x,
+          path[3].y,
+        );
+        context.globalAlpha =
+          pathIndex < activePathCount
+            ? phase === "compare" && pathIndex < 2
+              ? 0.72
+              : 0.38
+            : 0.12;
+        context.strokeStyle = signal;
+        context.lineWidth = pathIndex < activePathCount ? 1.35 : 1;
+        context.setLineDash([4, 8]);
+        context.lineDashOffset = reducedMotion ? 0 : -(time * 0.018);
+        context.stroke();
+        context.setLineDash([]);
+
+        if (pathIndex >= activePathCount) return;
+        const particleCount = phase === "model" && pathIndex < 2 ? 7 : 4;
+        for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+          const progress = reducedMotion
+            ? (particleIndex + 1) / (particleCount + 1)
+            : (time * 0.00018 + particleIndex / particleCount + pathIndex * 0.17) % 1;
+          const point = cubicPoint(path, progress);
+          context.beginPath();
+          context.globalAlpha = 0.48 + Math.sin(progress * Math.PI) * 0.48;
+          context.fillStyle = signal;
+          context.shadowColor = signal;
+          context.shadowBlur = 10;
+          context.arc(point.x, point.y, pathIndex === 2 ? 2.4 : 2, 0, Math.PI * 2);
+          context.fill();
+        }
+      });
+
+      context.shadowBlur = 0;
+      context.globalAlpha = phase === "model" ? 0.82 : 0.32;
+      context.strokeStyle = phase === "model" ? signal : primary;
+      context.lineWidth = 1;
+      const ringPulse = reducedMotion ? 0 : Math.sin(time * 0.0014) * 4;
+      [42, 62, 83].forEach((radius, index) => {
+        context.beginPath();
+        context.arc(
+          nodes.audience.x,
+          nodes.audience.y,
+          radius + ringPulse * (index / 3),
+          time * 0.00018 * (index + 1),
+          Math.PI * (1.35 + index * 0.18),
+        );
+        context.stroke();
+      });
+
+      if (phase === "decide") {
+        const pulse = reducedMotion ? 0 : (Math.sin(time * 0.003) + 1) * 0.5;
+        context.beginPath();
+        context.globalAlpha = 0.12 + pulse * 0.12;
+        context.fillStyle = signal;
+        context.arc(nodes.result.x, nodes.result.y, 48 + pulse * 9, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      context.restore();
+    };
+
+    const loop = (timestamp) => {
+      if (!isRunning) return;
+      draw(timestamp);
+      frame = window.requestAnimationFrame(loop);
+    };
+    const stopLoop = () => {
+      isRunning = false;
+      window.cancelAnimationFrame(frame);
+    };
+    const startLoop = () => {
+      if (reducedMotion || !isVisible || document.hidden || isRunning) return;
+      isRunning = true;
+      frame = window.requestAnimationFrame(loop);
+    };
+    const handlePointerMove = (event) => {
+      const bounds = container.getBoundingClientRect();
+      pointer.x = (event.clientX - bounds.left) / bounds.width;
+      pointer.y = (event.clientY - bounds.top) / bounds.height;
+    };
+    const handlePointerLeave = () => {
+      pointer.x = 0.5;
+      pointer.y = 0.5;
+    };
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      draw(performance.now());
+    });
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        if (reducedMotion) draw();
+        else startLoop();
+      } else {
+        stopLoop();
+      }
+    });
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopLoop();
+      else startLoop();
+    };
+
+    resizeObserver.observe(container);
+    visibilityObserver.observe(container);
+    container.addEventListener("pointermove", handlePointerMove);
+    container.addEventListener("pointerleave", handlePointerLeave);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    resize();
+    draw();
+    startLoop();
+
+    return () => {
+      stopLoop();
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      container.removeEventListener("pointermove", handlePointerMove);
+      container.removeEventListener("pointerleave", handlePointerLeave);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [phase]);
+
+  return <canvas aria-hidden="true" className="scene-canvas" ref={canvasRef} />;
+}
+
+function SignalScene() {
+  const phases = [
+    {
+      id: "compare",
+      label: "Compare",
+      status: "Creative inputs ready",
+      detail: "Two finished cuts enter the same test.",
+    },
+    {
+      id: "model",
+      label: "Model",
+      status: "Audience responding",
+      detail: "Preference and disagreement form the signal.",
+    },
+    {
+      id: "decide",
+      label: "Decide",
+      status: "Direction available",
+      detail: "Creative B leads with medium confidence.",
+    },
+  ];
+  const [activePhase, setActivePhase] = useState(0);
+  const [isManual, setIsManual] = useState(false);
+  const phase = phases[activePhase];
+
+  useEffect(() => {
+    if (isManual) return undefined;
+    const interval = window.setInterval(
+      () => setActivePhase((current) => (current + 1) % phases.length),
+      4200,
+    );
+    return () => window.clearInterval(interval);
+  }, [isManual, phases.length]);
 
   return (
-    <div
-      aria-label="Interactive diagram showing two audio creatives moving through a modeled audience and producing a directional result"
-      className="signal-scene"
-      onPointerLeave={resetTilt}
-      onPointerMove={updateTilt}
-      role="img"
-    >
-      <div className="flex items-center justify-between px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
-        <span>Decision model</span>
-        <span className="inline-flex items-center gap-2 text-signal">
+    <div className="signal-scene">
+      <div className="flex items-center justify-between gap-4 px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
+        <span>{phase.status}</span>
+        <span className="inline-flex shrink-0 items-center gap-2 text-signal">
           <span className="scene-live-dot size-1.5 rounded-full bg-signal" /> Live signal
         </span>
       </div>
-      <div aria-hidden="true" className="scene-stage">
-        <div className="scene-plane">
-          <span className="scene-grid" />
-          <span className="scene-orbit scene-orbit-one"><i /></span>
-          <span className="scene-orbit scene-orbit-two"><i /></span>
-          <svg className="scene-links" viewBox="0 0 600 360">
-            <path d="M96 114 C190 114 205 172 285 180" pathLength="1" />
-            <path d="M96 246 C190 246 205 188 285 180" pathLength="1" />
-            <path d="M325 180 C405 180 425 180 512 180" pathLength="1" />
-          </svg>
-          <div className="scene-node scene-node-a">
-            <span>A</span>
-            <small>30 sec</small>
+      <div className="scene-stage">
+        <SignalCanvas phase={phase.id} />
+        <div
+          className={`scene-node scene-node-a ${phase.id === "compare" ? "is-active" : ""}`}
+        >
+          <span>A</span>
+          <small>30 sec</small>
+        </div>
+        <div
+          className={`scene-node scene-node-b ${phase.id === "compare" ? "is-active" : ""}`}
+        >
+          <span>B</span>
+          <small>15 sec</small>
+        </div>
+        <div
+          className={`scene-audience ${phase.id === "model" ? "is-active" : ""}`}
+        >
+          <div className="scene-audience-core">
+            {Array.from({ length: 18 }, (_, index) => (
+              <span key={index} style={{ "--dot-index": index }} />
+            ))}
           </div>
-          <div className="scene-node scene-node-b">
-            <span>B</span>
-            <small>15 sec</small>
-          </div>
-          <div className="scene-audience">
-            <div className="scene-audience-core">
-              {Array.from({ length: 18 }, (_, index) => (
-                <span key={index} style={{ "--dot-index": index }} />
-              ))}
-            </div>
-            <small>Modeled audience</small>
-          </div>
-          <div className="scene-result">
-            <small>Direction</small>
-            <strong>B</strong>
-            <span>Medium confidence</span>
-          </div>
+          <small>Modeled audience</small>
+        </div>
+        <div
+          className={`scene-result ${phase.id === "decide" ? "is-active" : ""}`}
+        >
+          <small>Direction</small>
+          <strong>B</strong>
+          <span>Medium confidence</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 border-t border-white/10 text-center font-mono text-[7px] uppercase tracking-[0.1em] text-white/55">
-        <span className="px-2 py-4">Two creatives</span>
-        <span className="border-x border-white/10 px-2 py-4">One audience</span>
-        <span className="px-2 py-4 text-signal">One direction</span>
+      <div className="border-t border-white/10">
+        <p aria-live="polite" className="px-5 py-3 text-xs text-white/58">
+          {phase.detail}
+        </p>
+        <div className="grid grid-cols-3 border-t border-white/10">
+          {phases.map((item, index) => (
+            <button
+              aria-pressed={activePhase === index}
+              className={`scene-phase-button min-h-11 cursor-pointer border-white/10 px-2 font-mono text-[7px] uppercase tracking-[0.1em] not-last:border-r ${activePhase === index ? "is-active" : ""}`}
+              key={item.id}
+              onClick={() => {
+                setActivePhase(index);
+                setIsManual(true);
+              }}
+              type="button"
+            >
+              0{index + 1} · {item.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
 function Waveform({ bars, color }) {
   return (
     <div
