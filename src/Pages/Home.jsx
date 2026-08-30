@@ -11,9 +11,9 @@ const creativeB = [
 ];
 const distribution = [18, 24, 30, 38, 52, 68, 86, 100, 82, 64, 46, 32, 22];
 const resultMetrics = [
-  ["Message clarity", "78", "var(--primary)"],
-  ["Offer recall", "71", "var(--warning)"],
-  ["Skip likelihood", "32", "var(--accent)"],
+  ["Message clarity", "78", "var(--report-primary)"],
+  ["Offer recall", "71", "var(--report-teal)"],
+  ["Skip likelihood", "32", "var(--report-sage)"],
 ];
 
 function ArrowIcon() {
@@ -30,76 +30,339 @@ function ArrowIcon() {
   );
 }
 
-function SignalScene() {
-  const updateTilt = (event) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    event.currentTarget.style.setProperty("--scene-rotate-y", `${x * 12}deg`);
-    event.currentTarget.style.setProperty("--scene-rotate-x", `${y * -10}deg`);
-  };
+function SignalCanvas({ phase }) {
+  const canvasRef = useRef(null);
 
-  const resetTilt = (event) => {
-    event.currentTarget.style.removeProperty("--scene-rotate-x");
-    event.currentTarget.style.removeProperty("--scene-rotate-y");
-  };
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = canvas.parentElement;
+    const context = canvas.getContext("2d");
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const styles = getComputedStyle(document.documentElement);
+    const signal = styles.getPropertyValue("--signal").trim();
+    const primary = styles.getPropertyValue("--primary").trim();
+    const pointer = { x: 0.5, y: 0.5 };
+    let width = 0;
+    let height = 0;
+    let frame;
+    let isVisible = true;
+    let isRunning = false;
+
+    const cubicPoint = (path, progress) => {
+      const inverse = 1 - progress;
+      return {
+        x:
+          inverse ** 3 * path[0].x +
+          3 * inverse ** 2 * progress * path[1].x +
+          3 * inverse * progress ** 2 * path[2].x +
+          progress ** 3 * path[3].x,
+        y:
+          inverse ** 3 * path[0].y +
+          3 * inverse ** 2 * progress * path[1].y +
+          3 * inverse * progress ** 2 * path[2].y +
+          progress ** 3 * path[3].y,
+      };
+    };
+
+    const resize = () => {
+      const bounds = container.getBoundingClientRect();
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
+      width = bounds.width;
+      height = bounds.height;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    };
+
+    const draw = (timestamp = 0) => {
+      if (!width || !height) return;
+      const time = reducedMotion ? 0 : timestamp;
+      const shiftX = (pointer.x - 0.5) * 14;
+      const shiftY = (pointer.y - 0.5) * 10;
+      const nodes = {
+        a: { x: width * 0.15 + shiftX * 0.2, y: height * 0.32 + shiftY * 0.2 },
+        b: { x: width * 0.15 - shiftX * 0.15, y: height * 0.7 - shiftY * 0.15 },
+        audience: { x: width * 0.52 + shiftX * 0.55, y: height * 0.51 + shiftY * 0.5 },
+        result: { x: width * 0.84 + shiftX * 0.25, y: height * 0.51 + shiftY * 0.25 },
+      };
+      const paths = [
+        [
+          nodes.a,
+          { x: width * 0.3, y: nodes.a.y },
+          { x: width * 0.38, y: nodes.audience.y - height * 0.09 },
+          nodes.audience,
+        ],
+        [
+          nodes.b,
+          { x: width * 0.3, y: nodes.b.y },
+          { x: width * 0.38, y: nodes.audience.y + height * 0.09 },
+          nodes.audience,
+        ],
+        [
+          nodes.audience,
+          { x: width * 0.64, y: nodes.audience.y },
+          { x: width * 0.72, y: nodes.result.y },
+          nodes.result,
+        ],
+      ];
+      const activePathCount = phase === "decide" ? 3 : 2;
+
+      context.clearRect(0, 0, width, height);
+      context.save();
+
+      context.strokeStyle = "rgba(201, 245, 122, 0.055)";
+      context.lineWidth = 1;
+      const gridSize = width < 420 ? 24 : 30;
+      const gridOffsetX = (shiftX * -0.45) % gridSize;
+      const gridOffsetY = (shiftY * -0.45) % gridSize;
+      for (let x = gridOffsetX; x < width; x += gridSize) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, height);
+        context.stroke();
+      }
+      for (let y = gridOffsetY; y < height; y += gridSize) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(width, y);
+        context.stroke();
+      }
+
+      paths.forEach((path, pathIndex) => {
+        context.beginPath();
+        context.moveTo(path[0].x, path[0].y);
+        context.bezierCurveTo(
+          path[1].x,
+          path[1].y,
+          path[2].x,
+          path[2].y,
+          path[3].x,
+          path[3].y,
+        );
+        context.globalAlpha =
+          pathIndex < activePathCount
+            ? phase === "compare" && pathIndex < 2
+              ? 0.72
+              : 0.38
+            : 0.12;
+        context.strokeStyle = signal;
+        context.lineWidth = pathIndex < activePathCount ? 1.35 : 1;
+        context.setLineDash([4, 8]);
+        context.lineDashOffset = reducedMotion ? 0 : -(time * 0.018);
+        context.stroke();
+        context.setLineDash([]);
+
+        if (pathIndex >= activePathCount) return;
+        const particleCount = phase === "model" && pathIndex < 2 ? 7 : 4;
+        for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
+          const progress = reducedMotion
+            ? (particleIndex + 1) / (particleCount + 1)
+            : (time * 0.00018 + particleIndex / particleCount + pathIndex * 0.17) % 1;
+          const point = cubicPoint(path, progress);
+          context.beginPath();
+          context.globalAlpha = 0.48 + Math.sin(progress * Math.PI) * 0.48;
+          context.fillStyle = signal;
+          context.shadowColor = signal;
+          context.shadowBlur = 10;
+          context.arc(point.x, point.y, pathIndex === 2 ? 2.4 : 2, 0, Math.PI * 2);
+          context.fill();
+        }
+      });
+
+      context.shadowBlur = 0;
+      context.globalAlpha = phase === "model" ? 0.82 : 0.32;
+      context.strokeStyle = phase === "model" ? signal : primary;
+      context.lineWidth = 1;
+      const ringPulse = reducedMotion ? 0 : Math.sin(time * 0.0014) * 4;
+      [42, 62, 83].forEach((radius, index) => {
+        context.beginPath();
+        context.arc(
+          nodes.audience.x,
+          nodes.audience.y,
+          radius + ringPulse * (index / 3),
+          time * 0.00018 * (index + 1),
+          Math.PI * (1.35 + index * 0.18),
+        );
+        context.stroke();
+      });
+
+      if (phase === "decide") {
+        const pulse = reducedMotion ? 0 : (Math.sin(time * 0.003) + 1) * 0.5;
+        context.beginPath();
+        context.globalAlpha = 0.12 + pulse * 0.12;
+        context.fillStyle = signal;
+        context.arc(nodes.result.x, nodes.result.y, 48 + pulse * 9, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      context.restore();
+    };
+
+    const loop = (timestamp) => {
+      if (!isRunning) return;
+      draw(timestamp);
+      frame = window.requestAnimationFrame(loop);
+    };
+    const stopLoop = () => {
+      isRunning = false;
+      window.cancelAnimationFrame(frame);
+    };
+    const startLoop = () => {
+      if (reducedMotion || !isVisible || document.hidden || isRunning) return;
+      isRunning = true;
+      frame = window.requestAnimationFrame(loop);
+    };
+    const handlePointerMove = (event) => {
+      const bounds = container.getBoundingClientRect();
+      pointer.x = (event.clientX - bounds.left) / bounds.width;
+      pointer.y = (event.clientY - bounds.top) / bounds.height;
+    };
+    const handlePointerLeave = () => {
+      pointer.x = 0.5;
+      pointer.y = 0.5;
+    };
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      draw(performance.now());
+    });
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+      if (isVisible) {
+        if (reducedMotion) draw();
+        else startLoop();
+      } else {
+        stopLoop();
+      }
+    });
+    const handleVisibilityChange = () => {
+      if (document.hidden) stopLoop();
+      else startLoop();
+    };
+
+    resizeObserver.observe(container);
+    visibilityObserver.observe(container);
+    container.addEventListener("pointermove", handlePointerMove);
+    container.addEventListener("pointerleave", handlePointerLeave);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    resize();
+    draw();
+    startLoop();
+
+    return () => {
+      stopLoop();
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      container.removeEventListener("pointermove", handlePointerMove);
+      container.removeEventListener("pointerleave", handlePointerLeave);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [phase]);
+
+  return <canvas aria-hidden="true" className="scene-canvas" ref={canvasRef} />;
+}
+
+function SignalScene() {
+  const phases = [
+    {
+      id: "compare",
+      label: "Compare",
+      status: "Creative inputs ready",
+      detail: "Two finished cuts enter the same test.",
+    },
+    {
+      id: "model",
+      label: "Model",
+      status: "Audience responding",
+      detail: "Preference and disagreement form the signal.",
+    },
+    {
+      id: "decide",
+      label: "Decide",
+      status: "Direction available",
+      detail: "Creative B leads with medium confidence.",
+    },
+  ];
+  const [activePhase, setActivePhase] = useState(0);
+  const [isManual, setIsManual] = useState(false);
+  const phase = phases[activePhase];
+
+  useEffect(() => {
+    if (isManual) return undefined;
+    const interval = window.setInterval(
+      () => setActivePhase((current) => (current + 1) % phases.length),
+      4200,
+    );
+    return () => window.clearInterval(interval);
+  }, [isManual, phases.length]);
 
   return (
-    <div
-      aria-label="Interactive diagram showing two audio creatives moving through a modeled audience and producing a directional result"
-      className="signal-scene"
-      onPointerLeave={resetTilt}
-      onPointerMove={updateTilt}
-      role="img"
-    >
-      <div className="flex items-center justify-between px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
-        <span>Decision model</span>
-        <span className="inline-flex items-center gap-2 text-signal">
+    <div className="signal-scene">
+      <div className="flex items-center justify-between gap-4 px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
+        <span>{phase.status}</span>
+        <span className="inline-flex shrink-0 items-center gap-2 text-signal">
           <span className="scene-live-dot size-1.5 rounded-full bg-signal" /> Live signal
         </span>
       </div>
-      <div aria-hidden="true" className="scene-stage">
-        <div className="scene-plane">
-          <span className="scene-grid" />
-          <span className="scene-orbit scene-orbit-one"><i /></span>
-          <span className="scene-orbit scene-orbit-two"><i /></span>
-          <svg className="scene-links" viewBox="0 0 600 360">
-            <path d="M96 114 C190 114 205 172 285 180" pathLength="1" />
-            <path d="M96 246 C190 246 205 188 285 180" pathLength="1" />
-            <path d="M325 180 C405 180 425 180 512 180" pathLength="1" />
-          </svg>
-          <div className="scene-node scene-node-a">
-            <span>A</span>
-            <small>30 sec</small>
+      <div className="scene-stage">
+        <SignalCanvas phase={phase.id} />
+        <div
+          className={`scene-node scene-node-a ${phase.id === "compare" ? "is-active" : ""}`}
+        >
+          <span>A</span>
+          <small>30 sec</small>
+        </div>
+        <div
+          className={`scene-node scene-node-b ${phase.id === "compare" ? "is-active" : ""}`}
+        >
+          <span>B</span>
+          <small>15 sec</small>
+        </div>
+        <div
+          className={`scene-audience ${phase.id === "model" ? "is-active" : ""}`}
+        >
+          <div className="scene-audience-core">
+            {Array.from({ length: 18 }, (_, index) => (
+              <span key={index} style={{ "--dot-index": index }} />
+            ))}
           </div>
-          <div className="scene-node scene-node-b">
-            <span>B</span>
-            <small>15 sec</small>
-          </div>
-          <div className="scene-audience">
-            <div className="scene-audience-core">
-              {Array.from({ length: 18 }, (_, index) => (
-                <span key={index} style={{ "--dot-index": index }} />
-              ))}
-            </div>
-            <small>Modeled audience</small>
-          </div>
-          <div className="scene-result">
-            <small>Direction</small>
-            <strong>B</strong>
-            <span>Medium confidence</span>
-          </div>
+          <small>Modeled audience</small>
+        </div>
+        <div
+          className={`scene-result ${phase.id === "decide" ? "is-active" : ""}`}
+        >
+          <small>Direction</small>
+          <strong>B</strong>
+          <span>Medium confidence</span>
         </div>
       </div>
-      <div className="grid grid-cols-3 border-t border-white/10 text-center font-mono text-[7px] uppercase tracking-[0.1em] text-white/55">
-        <span className="px-2 py-4">Two creatives</span>
-        <span className="border-x border-white/10 px-2 py-4">One audience</span>
-        <span className="px-2 py-4 text-signal">One direction</span>
+      <div className="border-t border-white/10">
+        <p aria-live="polite" className="px-5 py-3 text-xs text-white/58">
+          {phase.detail}
+        </p>
+        <div className="grid grid-cols-3 border-t border-white/10">
+          {phases.map((item, index) => (
+            <button
+              aria-pressed={activePhase === index}
+              className={`scene-phase-button min-h-11 cursor-pointer border-white/10 px-2 font-mono text-[7px] uppercase tracking-[0.1em] not-last:border-r ${activePhase === index ? "is-active" : ""}`}
+              key={item.id}
+              onClick={() => {
+                setActivePhase(index);
+                setIsManual(true);
+              }}
+              type="button"
+            >
+              0{index + 1} · {item.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
 function Waveform({ bars, color }) {
   return (
     <div
@@ -302,24 +565,27 @@ function AudioDemo() {
   );
 }
 
-function CreativeTestColumn() {
+function CreativeTestColumn({ dashboardLayout = false }) {
   return (
-    <div className="bg-surface p-4 sm:p-6 lg:col-span-4">
-      <div className="mb-5 flex items-end justify-between">
+    <aside
+      className={`report-creative-column ${dashboardLayout ? "lg:col-span-4" : ""}`}
+    >
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">
-            Creative test
+          <p className="report-eyebrow">Test setup</p>
+          <h3 className="mt-2 text-xl font-semibold tracking-[-0.025em]">
+            Creative pair
+          </h3>
+          <p className="mt-1 text-xs leading-5 text-muted">
+            One message, two edit lengths.
           </p>
-          <h3 className="mt-1 text-lg font-semibold">A/B audio cuts</h3>
         </div>
-        <span className="rounded-full bg-surface-light px-2.5 py-1 font-mono text-[9px] text-muted">
-          Radio
-        </span>
+        <span className="report-chip">Radio</span>
       </div>
       <div className="space-y-3">
         <CreativeRow
           bars={creativeA}
-          color="var(--warning)"
+          color="var(--report-secondary)"
           detail="Full 30-second cut"
           duration="0:30"
           label="Creative A"
@@ -327,31 +593,32 @@ function CreativeTestColumn() {
         />
         <CreativeRow
           bars={creativeB}
-          color="var(--primary)"
+          color="var(--report-primary)"
           detail="Condensed 15-second cut"
           duration="0:15"
           label="Creative B"
           src="/audio/great-texas-airshow-15s.mp3"
         />
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 font-mono text-[8px] uppercase tracking-[0.08em] text-muted">
+      <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-[8px] uppercase tracking-[0.08em] text-muted">
         {["Hook", "Voice", "CTA"].map((item) => (
-          <span
-            className="rounded-lg border border-border px-2 py-2 text-center"
-            key={item}
-          >
+          <span className="report-attribute" key={item}>
             {item}
           </span>
         ))}
       </div>
-    </div>
+      <div className="report-variable-note">
+        <span>Test variable</span>
+        <strong>Cut length</strong>
+      </div>
+    </aside>
   );
 }
 
 function ExperimentView() {
   return (
     <div className="grid gap-px bg-border lg:grid-cols-12">
-      <CreativeTestColumn />
+      <CreativeTestColumn dashboardLayout />
       <div className="bg-surface p-4 sm:p-6 lg:col-span-5">
         <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
           Modeled audience definition
@@ -435,67 +702,71 @@ function ExperimentView() {
 
 function ResultsView() {
   return (
-    <div className="grid gap-px bg-border lg:grid-cols-12">
-      <div className="sticky top-18 z-20 flex items-center justify-between border-b border-primary/20 bg-surface px-4 py-3 shadow-sm lg:hidden">
+    <div className="report-results-grid">
+      <div className="report-mobile-summary lg:hidden">
         <div>
-          <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
-            Sample result
-          </p>
+          <p className="report-eyebrow">Current result</p>
           <p className="mt-1 text-sm font-semibold">Creative B leads</p>
         </div>
-        <span className="font-mono text-[8px] uppercase text-warning">
-          Medium confidence
-        </span>
+        <span className="report-confidence-pill">67% preference</span>
       </div>
       <CreativeTestColumn />
-      <div className="bg-surface p-4 sm:p-6 lg:col-span-5">
-        <div className="flex items-start justify-between gap-4">
+      <section className="report-primary-column">
+        <div className="report-outcome-header">
           <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-              Illustrative prediction
+            <p className="report-eyebrow">Directional result</p>
+            <h3 className="mt-3 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+              Creative B leads
+            </h3>
+            <p className="mt-3 max-w-120 text-sm leading-6 text-muted">
+              The condensed cut communicates the event and action sooner while
+              preserving the core message.
             </p>
-            <h3 className="mt-2 text-2xl font-semibold">Creative B leads</h3>
           </div>
-          <span className="rounded-full border border-warning/40 bg-warning/8 px-3 py-1 font-mono text-[8px] uppercase tracking-[0.1em] text-warning">
-            Medium confidence
-          </span>
+          <span className="report-confidence-pill">Medium confidence</span>
         </div>
-        <div className="mt-4 border border-primary/25 bg-primary/6 p-4 lg:hidden">
-          <p className="text-sm font-semibold">Why B leads</p>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            The condensed cut reaches the event, date, and call to action
-            sooner.
-          </p>
-        </div>
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-border bg-bg/65 p-4">
+        <div className="mt-7 grid gap-4 xl:grid-cols-[1.08fr_.92fr]">
+          <section className="report-data-card report-distribution-card">
             <div className="flex items-end justify-between">
-              <p className="text-sm font-medium">Preference distribution</p>
-              <p className="text-3xl font-semibold text-primary">67%</p>
+              <div>
+                <p className="text-sm font-semibold">Preference distribution</p>
+                <p className="mt-1 text-xs text-muted">Modeled response spread</p>
+              </div>
+              <p className="text-4xl font-semibold tracking-[-0.05em] text-[var(--report-primary)]">
+                67<span className="text-xl">%</span>
+              </p>
             </div>
-            <div className="mt-6 flex h-24 items-end justify-center gap-1.5">
+            <div className="report-chart mt-8 flex h-30 items-end justify-center gap-1.5">
               {distribution.map((height, index) => (
                 <span
-                  className="distribution-bar w-2 rounded-t-sm"
+                  className="distribution-bar w-2.5 rounded-t-sm"
                   key={`${height}-${index}`}
                   style={{
                     "--bar-delay": `${index * 45}ms`,
                     backgroundColor:
-                      index < 6 ? "var(--warning)" : "var(--primary)",
+                      index < 6
+                        ? "var(--report-secondary)"
+                        : "var(--report-primary)",
                     height: `${height}%`,
-                    opacity: 0.5 + Math.abs(6 - index) * 0.035,
+                    opacity: 0.64 + Math.abs(6 - index) * 0.025,
                   }}
                 />
               ))}
             </div>
-            <div className="mt-3 flex justify-between font-mono text-[8px] uppercase text-muted">
+            <div className="mt-4 flex justify-between font-mono text-[8px] uppercase tracking-[0.08em] text-muted">
               <span>More likely A</span>
               <span>More likely B</span>
             </div>
-          </div>
-          <div className="rounded-xl border border-border bg-bg/65 p-4">
-            <p className="text-sm font-medium">Modeled audience</p>
-            <div className="mt-5 grid grid-cols-8 gap-2">
+          </section>
+          <section className="report-data-card">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold">Audience agreement</p>
+                <p className="mt-1 text-xs text-muted">Illustrative personas</p>
+              </div>
+              <span className="report-chip">100 panel</span>
+            </div>
+            <div className="mt-7 grid grid-cols-8 gap-2.5">
               {Array.from({ length: 48 }, (_, index) => (
                 <span
                   className="audience-dot aspect-square rounded-full"
@@ -504,71 +775,93 @@ function ResultsView() {
                     "--dot-delay": `${index * 28}ms`,
                     backgroundColor:
                       index % 7 === 0
-                        ? "var(--accent)"
+                        ? "var(--report-lime)"
                         : index < 31
-                          ? "var(--primary)"
-                          : "var(--surface-light)",
-                    opacity: index < 31 ? 0.9 : 0.72,
+                          ? "var(--report-primary)"
+                          : "var(--report-soft)",
+                    opacity: index < 31 ? 0.94 : 1,
                   }}
                 />
               ))}
             </div>
-            <div className="mt-5 flex items-center justify-between text-xs text-muted">
-              <span>100 illustrative personas</span>
+            <div className="mt-6 flex items-center justify-between border-t border-[var(--report-border)] pt-4 text-xs text-muted">
+              <span>31 strong signals</span>
               <span>Texas · 18–54</span>
             </div>
+          </section>
+        </div>
+        <div className="report-reason-card">
+          <div className="report-reason-index">01</div>
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-sm font-semibold">Why B leads</p>
+              <span className="report-reason-tag">
+                Message arrives earlier
+              </span>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              Listeners reach the event, date, and call to action sooner in the
+              condensed cut.
+            </p>
           </div>
         </div>
-        <div className="mt-3 hidden rounded-xl border border-border bg-bg/65 p-4 lg:block">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-medium">Why B leads</p>
-            <span className="font-mono text-[9px] text-primary">
-              Earlier message
+      </section>
+      <aside className="report-insight-rail">
+        <section className="report-confidence-card">
+          <div className="flex items-center justify-between gap-4">
+            <p className="font-mono text-[8px] uppercase tracking-[0.16em] text-white/58">
+              Confidence summary
+            </p>
+            <span className="report-live-status">
+              <span /> Complete
             </span>
           </div>
-          <p className="text-sm leading-6 text-muted">
-            Listeners reach the event, date, and call to action sooner in the
-            condensed cut.
-          </p>
-        </div>
-      </div>
-      <div className="bg-surface p-4 sm:p-6 lg:col-span-3">
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-          Confidence summary
-        </p>
-        <div className="mt-6 flex justify-center">
-          <div
-            className="confidence-ring grid size-34 place-items-center rounded-full"
-            style={{
-              background:
-                "conic-gradient(var(--primary) 0 67%, var(--surface-light) 67% 100%)",
-            }}
-          >
-            <div className="grid size-25 place-items-center rounded-full bg-surface text-center">
-              <div>
-                <p className="text-4xl font-semibold">67%</p>
-                <p className="mt-1 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
-                  panel preference
-                </p>
+          <div className="mt-7 flex justify-center">
+            <div
+              className="confidence-ring report-confidence-ring grid size-38 place-items-center rounded-full"
+              style={{
+                background:
+                  "conic-gradient(var(--report-lime) 0 67%, rgba(255,255,255,.11) 67% 100%)",
+              }}
+            >
+              <div className="grid size-29 place-items-center rounded-full bg-[var(--report-dark)] text-center">
+                <div>
+                  <p className="text-4xl font-semibold tracking-[-0.05em] text-white">
+                    67%
+                  </p>
+                  <p className="mt-1 font-mono text-[7px] uppercase tracking-[0.14em] text-white/52">
+                    prefer B
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <details className="mt-6 border border-border bg-bg/65 lg:hidden">
-          <summary className="cursor-pointer px-4 py-3 text-sm font-semibold">
-            Secondary metrics
-          </summary>
-          <div className="space-y-3 border-t border-border p-3">
+          <div className="mt-6 border-t border-white/10 pt-5 text-center">
+            <p className="text-sm font-medium text-white">
+              Directional, not definitive
+            </p>
+            <p className="mt-1 text-xs leading-5 text-white/52">
+              Enough signal to choose the first in-market test.
+            </p>
+          </div>
+        </section>
+        <section className="report-metrics-card">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">Signal breakdown</p>
+            <span className="font-mono text-[8px] uppercase tracking-[0.1em] text-muted">
+              3 measures
+            </span>
+          </div>
+          <div className="mt-5 space-y-5">
             {resultMetrics.map(([label, value, color]) => (
-              <div
-                className="rounded-lg border border-border bg-surface p-3"
-                key={label}
-              >
+              <div key={label}>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted">{label}</span>
-                  <span className="font-mono">{value}%</span>
+                  <span className="font-mono text-[10px] font-semibold">
+                    {value}%
+                  </span>
                 </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-light">
+                <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-[var(--report-soft)]">
                   <span
                     className="metric-bar block h-full rounded-full"
                     style={{ backgroundColor: color, width: `${value}%` }}
@@ -577,30 +870,12 @@ function ResultsView() {
               </div>
             ))}
           </div>
-        </details>
-        <div className="mt-6 hidden space-y-3 lg:block">
-          {resultMetrics.map(([label, value, color]) => (
-            <div
-              className="rounded-lg border border-border bg-bg/65 p-3"
-              key={label}
-            >
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted">{label}</span>
-                <span className="font-mono">{value}%</span>
-              </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-light">
-                <span
-                  className="metric-bar block h-full rounded-full"
-                  style={{ backgroundColor: color, width: `${value}%` }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-        <p className="mt-5 rounded-lg border border-warning/30 bg-warning/6 px-3 py-3 text-xs leading-5 text-muted">
-          Illustrative modeled estimate—validate through a real campaign test.
+        </section>
+        <p className="report-disclaimer">
+          Illustrative modeled estimate. Validate direction through a real
+          campaign test.
         </p>
-      </div>
+      </aside>
     </div>
   );
 }
@@ -749,23 +1024,29 @@ function ExperimentDashboard() {
   };
 
   return (
-    <div className="mockup-shell reveal overflow-hidden rounded-xl border border-text/20 bg-surface shadow-2xl shadow-black/10">
-      <div className="flex min-h-14 items-center justify-between border-b border-border px-2 sm:px-6">
-        <div aria-hidden="true" className="hidden gap-1.5 sm:flex sm:gap-2">
-          <span className="size-2 rounded-full bg-accent sm:size-2.5" />
-          <span className="size-2 rounded-full bg-warning sm:size-2.5" />
-          <span className="size-2 rounded-full bg-primary/70 sm:size-2.5" />
+    <div className="product-report mockup-shell reveal overflow-hidden border bg-surface">
+      <div className="report-toolbar">
+        <div className="report-brand">
+          <span aria-hidden="true" className="report-brand-mark">
+            A<span>90</span>
+          </span>
+          <div>
+            <p className="text-xs font-semibold">Signal report</p>
+            <p className="mt-0.5 hidden font-mono text-[7px] uppercase tracking-[0.11em] text-muted sm:block">
+              Pre-market audio test
+            </p>
+          </div>
         </div>
         <div
           aria-label="Experiment report views"
-          className="flex min-h-13 flex-1 self-stretch font-mono text-[9px] uppercase tracking-[0.08em] text-muted sm:flex-none sm:text-xs sm:tracking-[0.16em]"
+          className="report-tabs"
           role="tablist"
         >
           {tabs.map((tab) => (
             <button
               aria-controls={`report-panel-${tab}`}
               aria-selected={activeTab === tab}
-              className={`report-tab flex min-h-12 flex-1 cursor-pointer items-center justify-center border-b-2 px-2 transition-colors sm:min-h-0 sm:flex-none sm:px-5 ${activeTab === tab ? "border-primary text-primary" : "border-transparent hover:text-text"}`}
+              className={`report-tab ${activeTab === tab ? "is-active" : ""}`}
               id={`report-tab-${tab}`}
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -777,9 +1058,12 @@ function ExperimentDashboard() {
             </button>
           ))}
         </div>
-        <span className="hidden font-mono text-[7px] text-muted sm:block sm:text-[9px]">
-          Sample A90-024
-        </span>
+        <div className="report-meta">
+          <span className="report-meta-status">
+            <span /> Analysis complete
+          </span>
+          <span className="font-mono text-[8px] text-muted">A90–024</span>
+        </div>
       </div>
 
       <div
@@ -794,13 +1078,13 @@ function ExperimentDashboard() {
         {activeTab === "calibration" && <CalibrationView />}
       </div>
 
-      <div className="flex flex-col gap-4 border-t border-border bg-bg/70 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="report-footer">
         <div className="flex flex-wrap gap-x-8 gap-y-2 font-mono text-[8px] uppercase tracking-[0.1em] text-muted">
           <span>Illustrative sample data</span>
           <span>Panel · 100 modeled personas</span>
         </div>
         <button
-          className="inline-flex cursor-pointer items-center justify-center gap-2 border border-border px-4 py-2 text-xs font-semibold transition-colors hover:border-text hover:bg-surface"
+          className="report-next-button"
           onClick={() => setActiveTab(actions[activeTab][1])}
           type="button"
         >
@@ -1067,7 +1351,7 @@ function Home() {
 
         <AudioDemo />
 
-        <section className="border-b border-border bg-bg" id="report">
+        <section className="report-section border-b border-border bg-bg" id="report">
           <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
             <div className="reveal mb-10 grid gap-6 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-8">
@@ -1084,14 +1368,14 @@ function Home() {
               </p>
             </div>
             <ExperimentDashboard />
-            <div className="reveal grid border-x border-b border-text/20 bg-signal sm:grid-cols-3">
+            <div className="report-value-strip reveal grid sm:grid-cols-3">
               {[
                 ["01", "Direction", "Know which creative to test first."],
                 ["02", "Reason", "See what moved the modeled response."],
                 ["03", "Uncertainty", "Keep disagreement visible before launch."],
               ].map(([number, title, detail]) => (
-                <div className="flex gap-4 border-text/20 p-5 not-last:border-b sm:not-last:border-b-0 sm:not-last:border-r" key={number}>
-                  <span className="font-mono text-[9px] font-semibold text-text/60">{number}</span>
+                <div className="report-value-item" key={number}>
+                  <span className="font-mono text-[9px] font-semibold text-[var(--report-primary)]">{number}</span>
                   <div>
                     <p className="text-sm font-semibold text-text">{title}</p>
                     <p className="mt-1 text-xs leading-5 text-text/70">{detail}</p>
