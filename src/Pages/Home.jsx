@@ -16,54 +16,6 @@ const resultMetrics = [
   ["Skip likelihood", "32", "var(--accent)"],
 ];
 
-const experimentInputs = [
-  {
-    type: "audience",
-    label: "Target audience",
-    title: "Texas families · 18–54",
-    detail: "English · Weekend planning",
-    color: "var(--primary)",
-  },
-  {
-    type: "creative",
-    label: "Creative variants",
-    title: "Audio A / Audio B",
-    detail: "Hook · Voice · Offer · CTA",
-    color: "var(--warning)",
-  },
-  {
-    type: "context",
-    label: "Campaign context",
-    title: "Radio awareness",
-    detail: "Community event · Two cut lengths",
-    color: "var(--accent)",
-  },
-];
-
-const experimentOutputs = [
-  {
-    label: "Direction",
-    title: "Creative B leads",
-    detail: "Stronger pre-market hypothesis",
-    value: "B",
-    color: "var(--primary)",
-  },
-  {
-    label: "Why it leads",
-    title: "Value lands earlier",
-    detail: "Clearer message and offer recall",
-    value: "+",
-    color: "var(--warning)",
-  },
-  {
-    label: "Uncertainty",
-    title: "Medium confidence",
-    detail: "Audience disagreement remains visible",
-    value: "67",
-    color: "var(--accent)",
-  },
-];
-
 function ArrowIcon() {
   return (
     <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 16 16">
@@ -78,60 +30,73 @@ function ArrowIcon() {
   );
 }
 
-function NodeIcon({ type }) {
-  if (type === "audience") {
-    return (
-      <svg
-        aria-hidden="true"
-        className="size-5"
-        fill="none"
-        viewBox="0 0 20 20"
-      >
-        <circle
-          cx="10"
-          cy="6.5"
-          r="3"
-          stroke="currentColor"
-          strokeWidth="1.5"
-        />
-        <path
-          d="M4.5 16c.5-3 2.4-4.5 5.5-4.5s5 1.5 5.5 4.5"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="1.5"
-        />
-      </svg>
-    );
-  }
-  if (type === "creative") {
-    return (
-      <svg
-        aria-hidden="true"
-        className="size-5"
-        fill="none"
-        viewBox="0 0 20 20"
-      >
-        <path
-          d="M2.5 10h2l1.5-5 2.2 10 2.2-8 1.8 6 1.5-3h3.8"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="1.5"
-        />
-      </svg>
-    );
-  }
+function SignalScene() {
+  const updateTilt = (event) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty("--scene-rotate-y", `${x * 12}deg`);
+    event.currentTarget.style.setProperty("--scene-rotate-x", `${y * -10}deg`);
+  };
+
+  const resetTilt = (event) => {
+    event.currentTarget.style.removeProperty("--scene-rotate-x");
+    event.currentTarget.style.removeProperty("--scene-rotate-y");
+  };
+
   return (
-    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 20 20">
-      <circle cx="10" cy="10" r="6.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M10 6v4l2.8 1.8"
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.5"
-      />
-    </svg>
+    <div
+      aria-label="Interactive diagram showing two audio creatives moving through a modeled audience and producing a directional result"
+      className="signal-scene"
+      onPointerLeave={resetTilt}
+      onPointerMove={updateTilt}
+      role="img"
+    >
+      <div className="flex items-center justify-between px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
+        <span>Decision model</span>
+        <span className="inline-flex items-center gap-2 text-signal">
+          <span className="scene-live-dot size-1.5 rounded-full bg-signal" /> Live signal
+        </span>
+      </div>
+      <div aria-hidden="true" className="scene-stage">
+        <div className="scene-plane">
+          <span className="scene-grid" />
+          <span className="scene-orbit scene-orbit-one"><i /></span>
+          <span className="scene-orbit scene-orbit-two"><i /></span>
+          <svg className="scene-links" viewBox="0 0 600 360">
+            <path d="M96 114 C190 114 205 172 285 180" pathLength="1" />
+            <path d="M96 246 C190 246 205 188 285 180" pathLength="1" />
+            <path d="M325 180 C405 180 425 180 512 180" pathLength="1" />
+          </svg>
+          <div className="scene-node scene-node-a">
+            <span>A</span>
+            <small>30 sec</small>
+          </div>
+          <div className="scene-node scene-node-b">
+            <span>B</span>
+            <small>15 sec</small>
+          </div>
+          <div className="scene-audience">
+            <div className="scene-audience-core">
+              {Array.from({ length: 18 }, (_, index) => (
+                <span key={index} style={{ "--dot-index": index }} />
+              ))}
+            </div>
+            <small>Modeled audience</small>
+          </div>
+          <div className="scene-result">
+            <small>Direction</small>
+            <strong>B</strong>
+            <span>Medium confidence</span>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 border-t border-white/10 text-center font-mono text-[7px] uppercase tracking-[0.1em] text-white/55">
+        <span className="px-2 py-4">Two creatives</span>
+        <span className="border-x border-white/10 px-2 py-4">One audience</span>
+        <span className="px-2 py-4 text-signal">One direction</span>
+      </div>
+    </div>
   );
 }
 
@@ -334,201 +299,6 @@ function AudioDemo() {
         </div>
       </div>
     </section>
-  );
-}
-
-function ConnectorLines({ reverse = false }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className="hidden h-full w-full xl:block"
-      preserveAspectRatio="none"
-      viewBox="0 0 100 430"
-    >
-      {[71, 171, 271].map((y, index) => (
-        <g key={y}>
-          <path
-            className="connector-base"
-            d={`M0 ${y} C35 ${y},65 ${y},100 ${y}`}
-          />
-          <path
-            className="connector-flow"
-            d={`M0 ${y} C35 ${y},65 ${y},100 ${y}`}
-            style={{
-              "--connector-delay": `${index * 180}ms`,
-              animationDirection: reverse ? "reverse" : "normal",
-            }}
-          />
-          <circle
-            cx={reverse ? 100 : 0}
-            cy={y}
-            fill={["var(--primary)", "var(--warning)", "var(--accent)"][index]}
-            r="3.5"
-          />
-          <circle
-            cx={reverse ? 0 : 100}
-            cy={y}
-            fill="var(--surface)"
-            r="4.5"
-            stroke="var(--border)"
-            strokeWidth="1.5"
-          />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function SignalCard({ item, input = false }) {
-  return (
-    <article className="connector-card flex min-h-25 items-center gap-3 rounded-lg border border-border bg-surface p-4 shadow-lg shadow-black/6">
-      <span
-        className="grid size-10 shrink-0 place-items-center rounded-md border bg-bg font-mono text-xs font-semibold"
-        style={{ borderColor: item.color, color: item.color }}
-      >
-        {input ? <NodeIcon type={item.type} /> : item.value}
-      </span>
-      <div className="min-w-0">
-        <p className="font-mono text-[7px] uppercase tracking-[0.14em] text-muted">
-          {item.label}
-        </p>
-        <h3 className="mt-1 text-sm font-semibold">{item.title}</h3>
-        <p className="mt-1 text-xs leading-5 text-muted">{item.detail}</p>
-      </div>
-    </article>
-  );
-}
-
-function ConnectorMap() {
-  return (
-    <div className="connector-board reveal rounded-xl border border-text/20 bg-bg p-4 shadow-[0_28px_90px_-52px_rgba(25,44,34,0.34)] sm:p-6 xl:p-8">
-      <div className="grid gap-5 xl:min-h-107 xl:grid-cols-[minmax(215px,1fr)_72px_minmax(310px,1.25fr)_72px_minmax(215px,1fr)] xl:items-stretch xl:gap-0">
-        <div className="order-1">
-          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-            01 · Inputs
-          </p>
-          <div className="grid gap-3">
-            {experimentInputs.map((item) => (
-              <SignalCard input item={item} key={item.label} />
-            ))}
-          </div>
-        </div>
-        <div className="order-2 hidden xl:block">
-          <ConnectorLines />
-        </div>
-
-        <div className="order-3 rounded-lg border border-primary/35 bg-surface p-5 shadow-lg shadow-primary/5 sm:p-6">
-          <div className="flex items-start justify-between gap-4 border-b border-border pb-5">
-            <div className="flex items-center gap-3">
-              <span className="lab-mark grid size-10 shrink-0 place-items-center rounded-md bg-primary/8 text-primary">
-                <svg
-                  aria-hidden="true"
-                  className="size-4"
-                  fill="none"
-                  viewBox="0 0 18 18"
-                >
-                  <path
-                    d="M2 9h2l1.3-4.5L7.2 14l2-9 1.8 7 1.4-3H16"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </span>
-              <div>
-                <p className="font-mono text-[8px] uppercase tracking-[0.15em] text-primary">
-                  Audio 90 engine
-                </p>
-                <h3 className="mt-1 text-xl font-semibold">
-                  Modeled Audience Lab
-                </h3>
-              </div>
-            </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-success/8 px-3 py-1.5 font-mono text-[7px] uppercase tracking-[0.1em] text-success">
-              <span className="lab-status size-1.5 rounded-full bg-success" />{" "}
-              Live
-            </span>
-          </div>
-          <div className="mt-5 grid gap-2">
-            {[
-              ["01", "Creative understanding", "Genome"],
-              ["02", "Audience simulation", "Panel"],
-              ["03", "Response modelling", "Signal"],
-            ].map(([number, title, tag]) => (
-              <div
-                className="flex items-center gap-3 rounded-md bg-bg px-3.5 py-3"
-                key={number}
-              >
-                <span className="font-mono text-[8px] text-primary">
-                  {number}
-                </span>
-                <span className="h-px w-4 bg-border" />
-                <span className="flex-1 text-xs text-muted">{title}</span>
-                <span className="font-mono text-[7px] uppercase tracking-[0.1em] text-muted">
-                  {tag}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mt-5 rounded-md border border-border bg-bg p-4">
-            <div className="flex items-center justify-between">
-              <p className="font-mono text-[7px] uppercase tracking-[0.12em] text-muted">
-                Modeled panel
-              </p>
-              <span className="font-mono text-[7px] text-primary">
-                ● Comparing A/B
-              </span>
-            </div>
-            <div className="mt-4 grid grid-cols-9 gap-2 sm:grid-cols-12">
-              {Array.from({ length: 36 }, (_, index) => (
-                <span
-                  className="audience-dot aspect-square rounded-full"
-                  key={index}
-                  style={{
-                    "--dot-delay": `${index * 45}ms`,
-                    backgroundColor:
-                      index % 7 === 0
-                        ? "var(--warning)"
-                        : index % 5 === 0
-                          ? "color-mix(in srgb, var(--primary) 38%, var(--surface-light))"
-                          : "var(--primary)",
-                    opacity: 0.48 + (index % 4) * 0.13,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          <p className="mt-5 flex items-center justify-center gap-2 font-mono text-[7px] uppercase tracking-[0.12em] text-muted">
-            <span className="size-1.5 rounded-full bg-warning" /> Estimate, not
-            ground truth
-          </p>
-        </div>
-
-        <div className="order-4 hidden xl:block">
-          <ConnectorLines reverse />
-        </div>
-        <div className="order-5">
-          <p className="mb-4 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">
-            02 · Signal
-          </p>
-          <div className="grid gap-3">
-            {experimentOutputs.map((item) => (
-              <SignalCard item={item} key={item.label} />
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="mt-5 flex flex-col gap-2 border border-warning/25 bg-warning/6 px-4 py-3 text-center sm:flex-row sm:items-center sm:justify-center sm:gap-4">
-        <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-warning">
-          Then reality closes the loop
-        </p>
-        <span className="hidden h-3 w-px bg-border sm:block" />
-        <p className="text-xs text-muted">
-          Launch the strongest hypothesis and return the real campaign result.
-        </p>
-      </div>
-    </div>
   );
 }
 
@@ -945,7 +715,7 @@ function CalibrationView() {
             </div>
           ))}
         </div>
-        <div className="mt-6 bg-accent p-4">
+        <div className="mt-6 bg-signal p-4">
           <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-text/65">
             What changed
           </p>
@@ -1080,103 +850,11 @@ function ProcessSection() {
   );
 }
 
-function UseCasesSection() {
-  const roles = [
-    {
-      title: "Brand teams",
-      detail: "Choose which message deserves the first media test.",
-      decision: "Which creative best communicates the campaign promise?",
-      output: "A ranked direction with clarity, recall, and disagreement signals.",
-      tag: "Message fit",
-    },
-    {
-      title: "Agencies",
-      detail: "Give creative recommendations a documented rationale.",
-      decision: "Which route should move from presentation into paid media?",
-      output: "An explainable comparison to support the recommendation.",
-      tag: "Client rationale",
-    },
-    {
-      title: "Creative strategists",
-      detail: "Compare hooks, voices, offers, and calls to action.",
-      decision: "Which creative choice is most likely driving preference?",
-      output: "Attribute-level reasoning and visible audience disagreement.",
-      tag: "Creative learning",
-    },
-    {
-      title: "Media buyers",
-      detail: "Reduce uncertainty before committing paid reach.",
-      decision: "Which ad should receive the first controlled media test?",
-      output: "A directional hypothesis ready for an in-market validation plan.",
-      tag: "Test priority",
-    },
-  ];
-  const [selectedRole, setSelectedRole] = useState(0);
-  const activeRole = roles[selectedRole];
-
-  return (
-    <section className="border-b border-border bg-surface" id="use-cases">
-      <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-        <div className="reveal grid gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-5">
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
-              Built for audio decisions
-            </p>
-            <h2 className="mt-5 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl">
-              For the people choosing what listeners hear first.
-            </h2>
-            <p className="mt-6 max-w-120 text-base leading-7 text-muted">
-              Use the same decision framework for streaming audio, podcasts,
-              digital radio, and traditional radio spots.
-            </p>
-          </div>
-          <div className="lg:col-span-7">
-            <div className="grid gap-px border border-border bg-border sm:grid-cols-2">
-              {roles.map((role, index) => (
-                <button
-                  aria-pressed={selectedRole === index}
-                  className={`min-h-35 cursor-pointer p-6 text-left transition-colors sm:p-7 ${selectedRole === index ? "bg-primary text-on-primary" : "bg-bg hover:bg-surface-light"}`}
-                  key={role.title}
-                  onClick={() => setSelectedRole(index)}
-                  type="button"
-                >
-                  <span className={`font-mono text-[8px] uppercase tracking-[0.12em] ${selectedRole === index ? "text-on-primary/70" : "text-accent"}`}>
-                    {role.tag}
-                  </span>
-                  <span className="mt-3 block text-lg font-semibold">{role.title}</span>
-                  <span className={`mt-2 block text-sm leading-6 ${selectedRole === index ? "text-on-primary/75" : "text-muted"}`}>
-                    {role.detail}
-                  </span>
-                </button>
-              ))}
-            </div>
-            <div className="use-case-panel mt-3 border border-primary/25 bg-primary/6 p-6 sm:p-7" key={activeRole.title}>
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div>
-                  <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-primary">Decision</p>
-                  <p className="mt-3 text-base font-semibold leading-6">{activeRole.decision}</p>
-                </div>
-                <div>
-                  <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-primary">Pilot output</p>
-                  <p className="mt-3 text-sm leading-6 text-muted">{activeRole.output}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function MethodologySection() {
   const principles = [
-    ["Audience definition", "A campaign brief becomes a modeled panel with explicit age, market, language, listening moment, platform, and objective."],
-    ["Creative evaluation", "Each ad is compared on hook, message clarity, offer recall, voice fit, call to action, and likely skip behavior."],
-    ["Uncertainty", "Preference spread, audience disagreement, and stability across repeated runs stay visible beside the direction."],
-    ["Validation status", "The current evidence is an internal benchmark—not independent proof of campaign lift. Pilot results must be checked in-market."],
-    ["Known limitations", "Modeled preference can miss culture, context, brand familiarity, media placement, and real listening behavior."],
-    ["Creative privacy", "Pilot storage and deletion terms are agreed before upload. Unreleased audio is never reused in demos or marketing without permission."],
+    ["Modeled, not measured", "The panel is simulated from an explicit audience brief. It is not a recruited human sample."],
+    ["Direction with uncertainty", "Every result keeps preference spread, disagreement, and rerun stability visible."],
+    ["Validated in-market", "A pilot produces a hypothesis—not promised lift. Real campaign outcomes remain the final test."],
   ];
 
   return (
@@ -1185,45 +863,26 @@ function MethodologySection() {
         <div className="reveal grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-8">
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
-              Methodology and limitations
+            Honest by design
             </p>
             <h2 className="mt-5 max-w-220 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl">
-              A testable hypothesis—not manufactured certainty.
+              Useful direction without false certainty.
             </h2>
           </div>
           <p className="max-w-125 text-base leading-7 text-muted lg:col-span-4">
-            A modeled audience is a simulated panel of AI-generated personas,
-            not recruited human respondents and not a promise of campaign lift.
+            Unreleased creative stays private, and retention terms are agreed
+            before any pilot files are uploaded.
           </p>
         </div>
 
-        <div className="reveal mt-12 grid gap-px border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
+        <div className="reveal mt-12 grid gap-px border border-border bg-border lg:grid-cols-3">
           {principles.map(([title, detail], index) => (
             <article className="bg-surface p-6 sm:p-7" key={title}>
               <p className="font-mono text-[8px] text-accent">0{index + 1}</p>
-              <h3 className="mt-5 text-lg font-semibold">{title}</h3>
+              <h3 className="mt-7 text-xl font-semibold">{title}</h3>
               <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
             </article>
           ))}
-        </div>
-
-        <div className="reveal mt-6 grid border border-warning/30 bg-warning/7 lg:grid-cols-12">
-          <div className="p-6 sm:p-8 lg:col-span-4">
-            <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-warning">
-              Initial internal benchmark
-            </p>
-            <p className="mt-4 text-4xl font-semibold">1,200</p>
-            <p className="mt-1 text-xs text-muted">model calls</p>
-          </div>
-          <div className="border-t border-warning/20 p-6 sm:p-8 lg:col-span-8 lg:border-l lg:border-t-0">
-            <p className="text-base leading-7 text-muted">
-              One hundred modeled personas evaluated four audio strategies. The
-              leading concept remained stable across multiple settings, but the
-              winning margins were small. That is why every report should show
-              disagreement and treat its result as direction to validate—not
-              ground truth.
-            </p>
-          </div>
         </div>
       </div>
     </section>
@@ -1346,7 +1005,7 @@ function Home() {
       <Navbar />
       <main id="main-content">
         <section
-          className="relative isolate overflow-hidden border-b border-border"
+          className="relative isolate overflow-hidden border-b border-white/10 bg-hero text-white"
           id="product"
           onPointerLeave={(event) => {
             event.currentTarget.style.removeProperty("--pointer-x");
@@ -1368,42 +1027,39 @@ function Home() {
             aria-hidden="true"
             className="hero-grid absolute inset-0 -z-20"
           />
-          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12 lg:py-28">
-            <div className="grid gap-10 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-8">
-                <p className="hero-item font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
-                  Pre-market testing for audio creative
+          <div className="mx-auto max-w-360 px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
+            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+              <div className="lg:col-span-7">
+                <p className="hero-item font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-signal">
+                  Direction before distribution
                 </p>
-                <h1 className="hero-item mt-6 text-5xl font-semibold leading-[0.89] tracking-[-0.068em] text-balance sm:text-7xl lg:text-[6.3rem]">
-                  Choose the audio ad to test first—
-                  <span className="hero-serif block font-normal italic text-accent">
-                    before you pay for reach.
+                <h1 className="hero-item mt-6 max-w-210 text-5xl font-semibold leading-[0.9] tracking-[-0.065em] text-balance sm:text-7xl lg:text-[5.65rem]">
+                  Hear the stronger idea
+                  <span className="hero-serif block font-normal italic text-signal">
+                    before the market does.
                   </span>
                 </h1>
-              </div>
-              <div className="hero-item lg:col-span-4 lg:pb-2">
-                <p className="max-w-120 text-base leading-7 text-muted sm:text-lg sm:leading-8">
-                  Compare two creatives with a modeled version of your target
-                  audience. Get a directional winner, the reasons behind it,
-                  and the uncertainty—then validate the hypothesis in-market.
+                <p className="hero-item mt-7 max-w-155 text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
+                  Compare two audio ads. Get a directional winner, the reason,
+                  and the uncertainty—in a few working days.
                 </p>
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+                <div className="hero-item mt-8 flex flex-col gap-3 sm:flex-row">
                   <a
-                    className="group inline-flex min-h-13 items-center justify-center gap-2 bg-text px-4 text-sm font-semibold text-surface transition-transform hover:-translate-y-0.5"
+                    className="group inline-flex min-h-13 items-center justify-center gap-2 bg-signal px-6 text-sm font-semibold text-hero transition-transform hover:-translate-y-0.5"
                     href="#pilot"
                   >
                     Request an early test <ArrowIcon />
                   </a>
                   <a
-                    className="inline-flex min-h-13 items-center justify-center border border-text/25 bg-surface px-4 text-sm font-semibold transition-colors hover:bg-surface-light"
-                    href="#report"
+                    className="inline-flex min-h-13 items-center justify-center border border-white/20 px-6 text-sm font-semibold text-white transition-colors hover:border-white/45 hover:bg-white/6"
+                    href="#demo"
                   >
-                    Explore a sample report
+                    Hear the A/B demo
                   </a>
                 </div>
-                <p className="mt-6 font-mono text-[8px] uppercase tracking-[0.12em] text-muted">
-                  A/B audio · Audience-specific · Explainable · Uncertainty included
-                </p>
+              </div>
+              <div className="hero-item lg:col-span-5">
+                <SignalScene />
               </div>
             </div>
           </div>
@@ -1428,7 +1084,7 @@ function Home() {
               </p>
             </div>
             <ExperimentDashboard />
-            <div className="reveal grid border-x border-b border-text/20 bg-accent sm:grid-cols-3">
+            <div className="reveal grid border-x border-b border-text/20 bg-signal sm:grid-cols-3">
               {[
                 ["01", "Direction", "Know which creative to test first."],
                 ["02", "Reason", "See what moved the modeled response."],
@@ -1447,92 +1103,8 @@ function Home() {
         </section>
 
         <ProcessSection />
-        <UseCasesSection />
-
-        <section className="border-b border-border bg-surface" id="method">
-          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-            <div className="reveal grid gap-8 lg:grid-cols-12 lg:items-end">
-              <div className="lg:col-span-8">
-                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
-                  How the signal is made
-                </p>
-                <h2 className="mt-5 max-w-225 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl">
-                  One lab. Three inputs. A decision you can defend.
-                </h2>
-              </div>
-              <p className="max-w-125 text-base leading-7 text-muted lg:col-span-4">
-                Audience, creative, and campaign context become one explainable signal.
-              </p>
-            </div>
-            <div className="mt-12"><ConnectorMap /></div>
-          </div>
-        </section>
 
         <MethodologySection />
-
-        <section className="border-b border-border bg-bg" id="science">
-          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-            <div className="calibration-panel reveal grid overflow-hidden border border-text/20 lg:grid-cols-12">
-              <div className="bg-accent p-7 sm:p-10 lg:col-span-5 lg:p-12">
-                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-text/65">
-                  Illustrative feedback loop
-                </p>
-                <h2 className="mt-7 text-4xl font-semibold leading-[0.96] tracking-[-0.055em] text-balance sm:text-6xl">
-                  The model does not get the last word.{" "}
-                  <span className="hero-serif font-normal italic">
-                    Reality does.
-                  </span>
-                </h2>
-                <p className="mt-7 max-w-115 text-base leading-7 text-text/75">
-                  Observed campaign results should recalibrate the next test.
-                </p>
-              </div>
-              <div className="bg-surface p-6 sm:p-10 lg:col-span-7 lg:p-12">
-                <div className="flex items-center justify-between border-b border-border pb-5">
-                  <div>
-                    <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-primary">
-                      Example campaign · CAM-042
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold">
-                      Prediction meets reality
-                    </h3>
-                  </div>
-                  <span className="bg-success/8 px-3 py-1.5 font-mono text-[8px] uppercase tracking-[0.1em] text-success">
-                    Illustrative data
-                  </span>
-                </div>
-                <div className="mt-7 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-3">
-                  {[
-                    ["Before launch", "B · 67%", "Modeled preference"],
-                    ["After launch", "B · +12.4%", "Example engagement"],
-                    ["Next campaign", "Model v4", "Example recalibration"],
-                  ].map(([label, value, detail], index) => (
-                    <div
-                      className={`${index === 2 ? "bg-success/7" : "bg-bg"} p-5`}
-                      key={label}
-                    >
-                      <p className="font-mono text-[7px] uppercase tracking-[0.1em] text-muted">
-                        {label}
-                      </p>
-                      <p className="mt-5 text-2xl font-semibold">{value}</p>
-                      <p className="mt-2 text-xs leading-5 text-muted">
-                        {detail}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-5 flex items-center justify-between gap-4 border border-warning/30 bg-warning/8 p-4">
-                  <span className="text-sm font-medium">
-                    Example: direction correct, magnitude overstated.
-                  </span>
-                  <span className="font-mono text-[9px] font-semibold text-warning">
-                    −5.6 pts
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <section className="bg-surface" id="pilot">
           <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
