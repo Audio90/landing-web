@@ -31,58 +31,6 @@ function ArrowIcon() {
   );
 }
 
-function HeroSignalStudio() {
-  return (
-    <div aria-hidden="true" className="hero-studio">
-      <div className="hero-studio-aura" />
-
-      <article className="hero-float-card hero-float-a">
-        <span className="hero-card-kicker">Creative A · 0:30</span>
-        <div className="hero-mini-wave">
-          {creativeA.slice(2, 16).map((height, index) => (
-            <span key={`${height}-${index}`} style={{ height: `${height * 0.42}px` }} />
-          ))}
-        </div>
-        <span className="hero-card-caption"><i className="hero-card-dot dot-coral" /> Full cut</span>
-      </article>
-
-      <article className="hero-float-card hero-float-b">
-        <span className="hero-card-kicker">Creative B · 0:15</span>
-        <div className="hero-mini-wave">
-          {creativeB.slice(2, 16).map((height, index) => (
-            <span key={`${height}-${index}`} style={{ height: `${height * 0.42}px` }} />
-          ))}
-        </div>
-        <span className="hero-card-caption"><i className="hero-card-dot dot-violet" /> Condensed cut</span>
-      </article>
-
-      <div className="hero-studio-core">
-        <p className="hero-command-copy">
-          Compare two audio ads against the audience and campaign context.
-        </p>
-        <div className="hero-command-actions">
-          <span className="hero-command-add">+</span>
-          <span className="hero-command-tag">@ Campaign brief</span>
-          <span className="hero-command-submit"><ArrowIcon /></span>
-        </div>
-      </div>
-
-      <article className="hero-float-card hero-float-metric">
-        <span className="hero-card-kicker">Directional result</span>
-        <p>Creative B leads</p>
-        <strong>67%</strong>
-        <span className="hero-card-caption">Medium confidence</span>
-      </article>
-
-      <div className="hero-studio-flow">
-        <span>✦ Compare creatives</span>
-        <span>▷ Model audience</span>
-        <span>▥ Measure result</span>
-      </div>
-    </div>
-  );
-}
-
 function SignalMarquee() {
   const items = ["Compare", "Predict", "Explain", "Validate", "Learn"];
   return (
@@ -827,39 +775,159 @@ function ExperimentDashboard() {
   );
 }
 
-function ProcessSection() {
-  const steps = [
-    ["01", "Add your creatives", "Provide two finished audio ads and the campaign brief."],
-    ["02", "Define the audience", "Specify audience, language, listening moment, platform, and objective."],
-    ["03", "Receive the signal", "See which creative leads, what drove the difference, and where people disagree."],
-    ["04", "Validate in-market", "Launch the strongest hypothesis and use the observed result to improve the next test."],
-  ];
+function FeatureStorySection() {
+  const stories = {
+    compare: {
+      label: "Compare",
+      kicker: "Creative input",
+      title: "Two finished audio ads, one shared campaign brief.",
+      body: "Keep the question focused: which execution should earn the first in-market test?",
+      stat: "A / B",
+    },
+    understand: {
+      label: "Understand",
+      kicker: "Modeled response",
+      title: "See the direction and what may be driving it.",
+      body: "Message clarity, offer recall, skip likelihood, and disagreement stay visible together.",
+      stat: "Why",
+    },
+    decide: {
+      label: "Decide",
+      kicker: "Test plan",
+      title: "Launch the strongest hypothesis—not a promised winner.",
+      body: "Use the report to choose what to validate, then let campaign performance have the final word.",
+      stat: "Next",
+    },
+  };
+  const [activeStory, setActiveStory] = useState("compare");
+  const current = stories[activeStory];
 
   return (
-    <section className="story-section process-section" id="process">
-      <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
-        <div className="reveal story-heading grid gap-8 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-8">
-            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
-              How it works
-            </p>
-            <h2 className="mt-5 max-w-210 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl">
-              From two audio ads to one stronger first test.
-            </h2>
-          </div>
-          <p className="max-w-125 text-base leading-7 text-muted lg:col-span-4">
+    <section className="feature-story story-section" id="process">
+      <div className="feature-story-visual reveal">
+        <img
+          alt="An abstract sound signal moving through violet and peach clouds toward a bright horizon"
+          loading="lazy"
+          src="/images/campaign-launch-clouds.webp"
+        />
+        <div className="feature-story-title">
+          <p>How it works</p>
+          <h2>From campaign brief to a stronger first test.</h2>
+        </div>
+      </div>
+
+      <div className="feature-story-panel reveal">
+        <div className="feature-story-intro">
+          <p className="story-eyebrow">A simpler creative decision</p>
+          <h3>Everything the team needs to choose what to test first.</h3>
+          <p>
             A directional A/B report is designed for a pilot turnaround of a
             few working days—not a months-long research cycle.
           </p>
         </div>
-        <div className="process-track reveal mt-14 grid sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map(([number, title, detail]) => (
-            <article className="step-card min-h-64 p-6" key={number}>
-              <p className="font-mono text-[9px] text-accent">{number}</p>
-              <h3 className="mt-10 text-xl font-semibold">{title}</h3>
-              <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
-            </article>
+
+        <div className="story-tabs" role="tablist" aria-label="Audio 90 workflow">
+          {Object.entries(stories).map(([key, story]) => (
+            <button
+              aria-selected={activeStory === key}
+              className={activeStory === key ? "is-active" : ""}
+              key={key}
+              onClick={() => setActiveStory(key)}
+              role="tab"
+              type="button"
+            >
+              {story.label}
+            </button>
           ))}
+        </div>
+
+        <div className="story-product-card" role="tabpanel" key={activeStory}>
+          <div className="story-product-topline">
+            <span>{current.kicker}</span>
+            <span>Audio 90 signal</span>
+          </div>
+          <div className="story-product-content">
+            <strong>{current.stat}</strong>
+            <div>
+              <h4>{current.title}</h4>
+              <p>{current.body}</p>
+            </div>
+            <span className="story-product-arrow"><ArrowIcon /></span>
+          </div>
+        </div>
+
+        <div className="feature-story-grid">
+          <article>
+            <span>01</span>
+            <h4>Built around the campaign brief</h4>
+            <p>
+              Add two finished creatives, then define the audience, language,
+              listening moment, platform, and objective.
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h4>See what moved the response</h4>
+            <p>
+              Receive a directional lead, the likely reasons behind it, and a
+              clear view of where modeled listeners disagree.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CampaignLearningSection() {
+  return (
+    <section className="campaign-learning story-section" id="campaigns">
+      <div className="campaign-learning-visual reveal">
+        <img
+          alt="A luminous signal crossing a twilight landscape and returning as a calibrated loop"
+          loading="lazy"
+          src="/images/campaign-learning-loop.webp"
+        />
+      </div>
+      <div className="campaign-learning-panel reveal">
+        <div className="campaign-learning-copy">
+          <p className="story-eyebrow">The campaign learning loop</p>
+          <h2>Every campaign makes the next signal smarter.</h2>
+          <p>
+            Audio 90 helps you start with a stronger hypothesis. The real
+            campaign then validates the direction and creates context for the
+            next creative decision.
+          </p>
+        </div>
+
+        <div aria-label="Illustrative campaign learning loop" className="learning-orbit">
+          <div className="learning-ring learning-ring-one" />
+          <div className="learning-ring learning-ring-two" />
+          <div className="learning-core">
+            <span>01</span>
+            <strong>Predict</strong>
+            <small>Pre-market signal</small>
+          </div>
+          <div className="learning-node learning-node-launch"><span>02</span> Launch</div>
+          <div className="learning-node learning-node-observe"><span>03</span> Observe</div>
+          <div className="learning-node learning-node-learn"><span>04</span> Learn</div>
+        </div>
+
+        <div className="learning-metrics">
+          <div><strong>Direction</strong><span>Confirmed or challenged</span></div>
+          <div><strong>Magnitude</strong><span>Calibrated by results</span></div>
+          <div><strong>Next test</strong><span>Informed by evidence</span></div>
+        </div>
+
+        <div className="campaign-learning-grid">
+          <article>
+            <h3>Launch with a stronger hypothesis</h3>
+            <p>Choose the creative to test first without pretending modeled preference is guaranteed lift.</p>
+          </article>
+          <article>
+            <h3>Return performance data</h3>
+            <p>Use observed outcomes to sharpen the assumptions behind the next campaign and creative comparison.</p>
+          </article>
         </div>
       </div>
     </section>
@@ -1132,8 +1200,6 @@ function Home() {
           onPointerLeave={(event) => {
             event.currentTarget.style.removeProperty("--pointer-x");
             event.currentTarget.style.removeProperty("--pointer-y");
-            event.currentTarget.style.removeProperty("--studio-x");
-            event.currentTarget.style.removeProperty("--studio-y");
           }}
           onPointerMove={(event) => {
             const bounds = event.currentTarget.getBoundingClientRect();
@@ -1146,14 +1212,6 @@ function Home() {
             event.currentTarget.style.setProperty(
               "--pointer-y",
               `${normalizedY * 100}%`,
-            );
-            event.currentTarget.style.setProperty(
-              "--studio-x",
-              (normalizedX * 2 - 1).toFixed(3),
-            );
-            event.currentTarget.style.setProperty(
-              "--studio-y",
-              (normalizedY * 2 - 1).toFixed(3),
             );
           }}
         >
@@ -1190,8 +1248,12 @@ function Home() {
                 </div>
               </div>
             </div>
-            <div className="hero-item hero-studio-wrap">
-              <HeroSignalStudio />
+            <div className="hero-proof-row hero-item" aria-label="Audio 90 product principles">
+              <span>Private creative</span>
+              <i aria-hidden="true" />
+              <span>Directional, not definitive</span>
+              <i aria-hidden="true" />
+              <span>Few working days</span>
             </div>
           </div>
         </section>
@@ -1199,6 +1261,8 @@ function Home() {
         <SignalMarquee />
 
         <AudioDemo />
+
+        <FeatureStorySection />
 
         <section className="report-section story-section" id="report">
           <div className="report-scene mx-auto max-w-375 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
@@ -1237,7 +1301,7 @@ function Home() {
           </div>
         </section>
 
-        <ProcessSection />
+        <CampaignLearningSection />
 
         <MethodologySection />
 
@@ -1262,21 +1326,45 @@ function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-surface" id="about">
-        <div className="mx-auto grid max-w-360 gap-6 px-5 py-9 sm:px-8 md:grid-cols-3 md:items-end lg:px-12">
-          <div>
-            <p className="font-semibold">Audio <span className="text-primary">90</span></p>
-            <p className="mt-2 text-xs text-muted">Pre-market signals for audio creative.</p>
+      <footer className="site-footer" id="about">
+        <div className="footer-glow" aria-hidden="true" />
+        <div className="mx-auto max-w-360 px-5 sm:px-8 lg:px-12">
+          <div className="footer-cta">
+            <p className="story-eyebrow">Direction before distribution</p>
+            <h2>Ready to hear the stronger idea?</h2>
+            <a className="footer-cta-button" href="#waitlist">
+              Join the waitlist <ArrowIcon />
+            </a>
           </div>
-          <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-muted md:justify-center">
-            <a className="hover:text-text" href="#methodology">Methodology</a>
-            <a className="hover:text-text" href="/privacy.html">Privacy</a>
-            <a className="hover:text-text" href="/terms.html">Terms</a>
-            <a className="hover:text-text" href="mailto:hello@audio90.in">Contact</a>
-          </nav>
-          <p className="font-mono text-[8px] uppercase tracking-[0.12em] text-muted md:text-right">
-            Estimate · validate · learn
-          </p>
+          <div className="footer-main">
+            <div className="footer-brand">
+              <p>Audio <span>90</span></p>
+              <h3>Pre-market signals for audio creative.</h3>
+              <span>Estimate first. Validate in-market. Learn every time.</span>
+            </div>
+            <nav aria-label="Product links" className="footer-links">
+              <p>Product</p>
+              <a href="#demo">Audio demo</a>
+              <a href="#report">Sample report</a>
+              <a href="#process">How it works</a>
+            </nav>
+            <nav aria-label="Company links" className="footer-links">
+              <p>Principles</p>
+              <a href="#methodology">Methodology</a>
+              <a href="/privacy.html">Privacy</a>
+              <a href="/terms.html">Terms</a>
+            </nav>
+            <div className="footer-links">
+              <p>Contact</p>
+              <a href="mailto:hello@audio90.in">hello@audio90.in</a>
+              <span>Built for teams deciding what listeners hear next.</span>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>© {new Date().getFullYear()} Audio 90</span>
+            <span>Directional evidence, honestly framed.</span>
+            <a href="#top">Back to top ↑</a>
+          </div>
         </div>
       </footer>
     </div>
