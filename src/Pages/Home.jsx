@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Component, lazy, Suspense, useEffect, useRef, useState } from "react";
 import Navbar from "../Reusable/Navbar/Navbar";
 
 const creativeA = [
@@ -30,336 +30,185 @@ function ArrowIcon() {
   );
 }
 
-function SignalCanvas({ phase }) {
-  const canvasRef = useRef(null);
+const LazyLiquidShader = lazy(async () => {
+  const { ShaderGradient, ShaderGradientCanvas } = await import(
+    "@shadergradient/react"
+  );
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const container = canvas.parentElement;
-    const context = canvas.getContext("2d");
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const styles = getComputedStyle(document.documentElement);
-    const signal = styles.getPropertyValue("--signal").trim();
-    const primary = styles.getPropertyValue("--primary").trim();
-    const pointer = { x: 0.5, y: 0.5 };
-    let width = 0;
-    let height = 0;
-    let frame;
-    let isVisible = true;
-    let isRunning = false;
+  function LiquidShader({ animate, compact, pixelDensity }) {
+    return (
+      <ShaderGradientCanvas
+        className="liquid-wave-canvas"
+        fov={43}
+        lazyLoad={false}
+        pixelDensity={pixelDensity}
+        pointerEvents="none"
+        powerPreference="high-performance"
+      >
+        <ShaderGradient
+          animate={animate ? "on" : "off"}
+          brightness={1.16}
+          cAzimuthAngle={180}
+          cPolarAngle={90}
+          cDistance={compact ? 4.1 : 3.6}
+          color1="#edf5e9"
+          color2="#145643"
+          color3="#b8e873"
+          control="props"
+          enableCameraUpdate={false}
+          enableTransition={false}
+          grain="off"
+          lightType="3d"
+          positionX={compact ? 0 : -0.12}
+          positionY={-0.08}
+          reflection={0.48}
+          rotationX={0}
+          rotationY={10}
+          rotationZ={compact ? 43 : 50}
+          shader="defaults"
+          type="plane"
+          uAmplitude={1}
+          uDensity={1.3}
+          uFrequency={5.5}
+          uSpeed={compact ? 0.045 : 0.07}
+          uStrength={4}
+          uTime={0}
+          wireframe={false}
+        />
+      </ShaderGradientCanvas>
+    );
+  }
 
-    const cubicPoint = (path, progress) => {
-      const inverse = 1 - progress;
-      return {
-        x:
-          inverse ** 3 * path[0].x +
-          3 * inverse ** 2 * progress * path[1].x +
-          3 * inverse * progress ** 2 * path[2].x +
-          progress ** 3 * path[3].x,
-        y:
-          inverse ** 3 * path[0].y +
-          3 * inverse ** 2 * progress * path[1].y +
-          3 * inverse * progress ** 2 * path[2].y +
-          progress ** 3 * path[3].y,
-      };
-    };
+  return { default: LiquidShader };
+});
 
-    const resize = () => {
-      const bounds = container.getBoundingClientRect();
-      const ratio = Math.min(window.devicePixelRatio || 1, 1.75);
-      width = bounds.width;
-      height = bounds.height;
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    };
-
-    const draw = (timestamp = 0) => {
-      if (!width || !height) return;
-      const time = reducedMotion ? 0 : timestamp;
-      const shiftX = (pointer.x - 0.5) * 14;
-      const shiftY = (pointer.y - 0.5) * 10;
-      const nodes = {
-        a: { x: width * 0.15 + shiftX * 0.2, y: height * 0.32 + shiftY * 0.2 },
-        b: { x: width * 0.15 - shiftX * 0.15, y: height * 0.7 - shiftY * 0.15 },
-        audience: { x: width * 0.52 + shiftX * 0.55, y: height * 0.51 + shiftY * 0.5 },
-        result: { x: width * 0.84 + shiftX * 0.25, y: height * 0.51 + shiftY * 0.25 },
-      };
-      const paths = [
-        [
-          nodes.a,
-          { x: width * 0.3, y: nodes.a.y },
-          { x: width * 0.38, y: nodes.audience.y - height * 0.09 },
-          nodes.audience,
-        ],
-        [
-          nodes.b,
-          { x: width * 0.3, y: nodes.b.y },
-          { x: width * 0.38, y: nodes.audience.y + height * 0.09 },
-          nodes.audience,
-        ],
-        [
-          nodes.audience,
-          { x: width * 0.64, y: nodes.audience.y },
-          { x: width * 0.72, y: nodes.result.y },
-          nodes.result,
-        ],
-      ];
-      const activePathCount = phase === "decide" ? 3 : 2;
-
-      context.clearRect(0, 0, width, height);
-      context.save();
-
-      context.strokeStyle = "rgba(201, 245, 122, 0.055)";
-      context.lineWidth = 1;
-      const gridSize = width < 420 ? 24 : 30;
-      const gridOffsetX = (shiftX * -0.45) % gridSize;
-      const gridOffsetY = (shiftY * -0.45) % gridSize;
-      for (let x = gridOffsetX; x < width; x += gridSize) {
-        context.beginPath();
-        context.moveTo(x, 0);
-        context.lineTo(x, height);
-        context.stroke();
-      }
-      for (let y = gridOffsetY; y < height; y += gridSize) {
-        context.beginPath();
-        context.moveTo(0, y);
-        context.lineTo(width, y);
-        context.stroke();
-      }
-
-      paths.forEach((path, pathIndex) => {
-        context.beginPath();
-        context.moveTo(path[0].x, path[0].y);
-        context.bezierCurveTo(
-          path[1].x,
-          path[1].y,
-          path[2].x,
-          path[2].y,
-          path[3].x,
-          path[3].y,
-        );
-        context.globalAlpha =
-          pathIndex < activePathCount
-            ? phase === "compare" && pathIndex < 2
-              ? 0.72
-              : 0.38
-            : 0.12;
-        context.strokeStyle = signal;
-        context.lineWidth = pathIndex < activePathCount ? 1.35 : 1;
-        context.setLineDash([4, 8]);
-        context.lineDashOffset = reducedMotion ? 0 : -(time * 0.018);
-        context.stroke();
-        context.setLineDash([]);
-
-        if (pathIndex >= activePathCount) return;
-        const particleCount = phase === "model" && pathIndex < 2 ? 7 : 4;
-        for (let particleIndex = 0; particleIndex < particleCount; particleIndex += 1) {
-          const progress = reducedMotion
-            ? (particleIndex + 1) / (particleCount + 1)
-            : (time * 0.00018 + particleIndex / particleCount + pathIndex * 0.17) % 1;
-          const point = cubicPoint(path, progress);
-          context.beginPath();
-          context.globalAlpha = 0.48 + Math.sin(progress * Math.PI) * 0.48;
-          context.fillStyle = signal;
-          context.shadowColor = signal;
-          context.shadowBlur = 10;
-          context.arc(point.x, point.y, pathIndex === 2 ? 2.4 : 2, 0, Math.PI * 2);
-          context.fill();
-        }
-      });
-
-      context.shadowBlur = 0;
-      context.globalAlpha = phase === "model" ? 0.82 : 0.32;
-      context.strokeStyle = phase === "model" ? signal : primary;
-      context.lineWidth = 1;
-      const ringPulse = reducedMotion ? 0 : Math.sin(time * 0.0014) * 4;
-      [42, 62, 83].forEach((radius, index) => {
-        context.beginPath();
-        context.arc(
-          nodes.audience.x,
-          nodes.audience.y,
-          radius + ringPulse * (index / 3),
-          time * 0.00018 * (index + 1),
-          Math.PI * (1.35 + index * 0.18),
-        );
-        context.stroke();
-      });
-
-      if (phase === "decide") {
-        const pulse = reducedMotion ? 0 : (Math.sin(time * 0.003) + 1) * 0.5;
-        context.beginPath();
-        context.globalAlpha = 0.12 + pulse * 0.12;
-        context.fillStyle = signal;
-        context.arc(nodes.result.x, nodes.result.y, 48 + pulse * 9, 0, Math.PI * 2);
-        context.fill();
-      }
-
-      context.restore();
-    };
-
-    const loop = (timestamp) => {
-      if (!isRunning) return;
-      draw(timestamp);
-      frame = window.requestAnimationFrame(loop);
-    };
-    const stopLoop = () => {
-      isRunning = false;
-      window.cancelAnimationFrame(frame);
-    };
-    const startLoop = () => {
-      if (reducedMotion || !isVisible || document.hidden || isRunning) return;
-      isRunning = true;
-      frame = window.requestAnimationFrame(loop);
-    };
-    const handlePointerMove = (event) => {
-      const bounds = container.getBoundingClientRect();
-      pointer.x = (event.clientX - bounds.left) / bounds.width;
-      pointer.y = (event.clientY - bounds.top) / bounds.height;
-    };
-    const handlePointerLeave = () => {
-      pointer.x = 0.5;
-      pointer.y = 0.5;
-    };
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      draw(performance.now());
-    });
-    const visibilityObserver = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-      if (isVisible) {
-        if (reducedMotion) draw();
-        else startLoop();
-      } else {
-        stopLoop();
-      }
-    });
-    const handleVisibilityChange = () => {
-      if (document.hidden) stopLoop();
-      else startLoop();
-    };
-
-    resizeObserver.observe(container);
-    visibilityObserver.observe(container);
-    container.addEventListener("pointermove", handlePointerMove);
-    container.addEventListener("pointerleave", handlePointerLeave);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    resize();
-    draw();
-    startLoop();
-
-    return () => {
-      stopLoop();
-      resizeObserver.disconnect();
-      visibilityObserver.disconnect();
-      container.removeEventListener("pointermove", handlePointerMove);
-      container.removeEventListener("pointerleave", handlePointerLeave);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [phase]);
-
-  return <canvas aria-hidden="true" className="scene-canvas" ref={canvasRef} />;
+function LiquidWavePoster() {
+  return (
+    <div aria-hidden="true" className="liquid-wave-poster">
+      <span />
+    </div>
+  );
 }
 
-function SignalScene() {
-  const phases = [
-    {
-      id: "compare",
-      label: "Compare",
-      status: "Creative inputs ready",
-      detail: "Two finished cuts enter the same test.",
-    },
-    {
-      id: "model",
-      label: "Model",
-      status: "Audience responding",
-      detail: "Preference and disagreement form the signal.",
-    },
-    {
-      id: "decide",
-      label: "Decide",
-      status: "Direction available",
-      detail: "Creative B leads with medium confidence.",
-    },
-  ];
-  const [activePhase, setActivePhase] = useState(0);
-  const [isManual, setIsManual] = useState(false);
-  const phase = phases[activePhase];
+class LiquidWaveErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  render() {
+    if (this.state.failed) return <LiquidWavePoster />;
+    return this.props.children;
+  }
+}
+
+function LiquidWaveHero() {
+  const rootRef = useRef(null);
+  const [renderState, setRenderState] = useState({
+    animate: false,
+    compact: false,
+    pixelDensity: 1,
+    shouldRender: false,
+  });
 
   useEffect(() => {
-    if (isManual) return undefined;
-    const interval = window.setInterval(
-      () => setActivePhase((current) => (current + 1) % phases.length),
-      4200,
+    const root = rootRef.current;
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
     );
-    return () => window.clearInterval(interval);
-  }, [isManual, phases.length]);
+    const compactQuery = window.matchMedia("(max-width: 640px)");
+    const connection = navigator.connection;
+    const saveData = Boolean(connection?.saveData);
+    const lowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
+    const testCanvas = document.createElement("canvas");
+    const supportsWebGL = Boolean(
+      testCanvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true }) ||
+        testCanvas.getContext("webgl", { failIfMajorPerformanceCaveat: true }),
+    );
+    let isInView = false;
+
+    const updateState = () => {
+      const compact = compactQuery.matches;
+      setRenderState({
+        animate: !reducedMotionQuery.matches,
+        compact,
+        pixelDensity: Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.25),
+        shouldRender:
+          isInView && !document.hidden && supportsWebGL && !saveData && !lowMemory,
+      });
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isInView = entry.isIntersecting;
+        updateState();
+      },
+      { rootMargin: "160px 0px", threshold: 0.01 },
+    );
+
+    observer.observe(root);
+    reducedMotionQuery.addEventListener("change", updateState);
+    compactQuery.addEventListener("change", updateState);
+    document.addEventListener("visibilitychange", updateState);
+    updateState();
+
+    return () => {
+      observer.disconnect();
+      reducedMotionQuery.removeEventListener("change", updateState);
+      compactQuery.removeEventListener("change", updateState);
+      document.removeEventListener("visibilitychange", updateState);
+    };
+  }, []);
 
   return (
-    <div className="signal-scene">
-      <div className="flex items-center justify-between gap-4 px-5 pt-5 font-mono text-[8px] uppercase tracking-[0.14em] text-white/55">
-        <span>{phase.status}</span>
-        <span className="inline-flex shrink-0 items-center gap-2 text-signal">
-          <span className="scene-live-dot size-1.5 rounded-full bg-signal" /> Live signal
-        </span>
-      </div>
-      <div className="scene-stage">
-        <SignalCanvas phase={phase.id} />
-        <div
-          className={`scene-node scene-node-a ${phase.id === "compare" ? "is-active" : ""}`}
-        >
-          <span>A</span>
-          <small>30 sec</small>
-        </div>
-        <div
-          className={`scene-node scene-node-b ${phase.id === "compare" ? "is-active" : ""}`}
-        >
-          <span>B</span>
-          <small>15 sec</small>
-        </div>
-        <div
-          className={`scene-audience ${phase.id === "model" ? "is-active" : ""}`}
-        >
-          <div className="scene-audience-core">
-            {Array.from({ length: 18 }, (_, index) => (
-              <span key={index} style={{ "--dot-index": index }} />
-            ))}
-          </div>
-          <small>Modeled audience</small>
-        </div>
-        <div
-          className={`scene-result ${phase.id === "decide" ? "is-active" : ""}`}
-        >
-          <small>Direction</small>
-          <strong>B</strong>
-          <span>Medium confidence</span>
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <p aria-live="polite" className="px-5 py-3 text-xs text-white/58">
-          {phase.detail}
-        </p>
-        <div className="grid grid-cols-3 border-t border-white/10">
-          {phases.map((item, index) => (
-            <button
-              aria-pressed={activePhase === index}
-              className={`scene-phase-button min-h-11 cursor-pointer border-white/10 px-2 font-mono text-[7px] uppercase tracking-[0.1em] not-last:border-r ${activePhase === index ? "is-active" : ""}`}
-              key={item.id}
-              onClick={() => {
-                setActivePhase(index);
-                setIsManual(true);
-              }}
-              type="button"
-            >
-              0{index + 1} · {item.label}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div
+      aria-hidden="true"
+      className="liquid-wave-stage"
+      data-motion={renderState.animate ? "ambient" : "still"}
+      data-rendering={renderState.shouldRender ? "shader" : "poster"}
+      ref={rootRef}
+    >
+      <svg aria-hidden="true" className="liquid-wave-defs" focusable="false">
+        <defs>
+          <linearGradient id="liquid-wave-edge" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stopColor="#f6fff0" stopOpacity=".78" />
+            <stop offset=".45" stopColor="#c9f57a" stopOpacity=".36" />
+            <stop offset="1" stopColor="#79b39b" stopOpacity=".08" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="liquid-wave-glow" />
+      <LiquidWaveErrorBoundary>
+        {renderState.shouldRender ? (
+          <Suspense fallback={<LiquidWavePoster />}>
+            <LazyLiquidShader
+              animate={renderState.animate}
+              compact={renderState.compact}
+              pixelDensity={renderState.pixelDensity}
+            />
+          </Suspense>
+        ) : (
+          <LiquidWavePoster />
+        )}
+      </LiquidWaveErrorBoundary>
+      <svg
+        aria-hidden="true"
+        className="liquid-wave-highlights"
+        focusable="false"
+        viewBox="0 0 1000 500"
+      >
+        <path
+          d="M35 305C125 65 305 70 430 235C550 395 645 395 760 225C850 95 925 90 995 175"
+          pathLength="1"
+        />
+        <path
+          d="M90 303C190 130 307 150 410 280C530 430 645 446 785 310C861 235 920 222 970 252"
+          pathLength="1"
+        />
+      </svg>
     </div>
   );
 }
@@ -1294,16 +1143,28 @@ function Home() {
           onPointerLeave={(event) => {
             event.currentTarget.style.removeProperty("--pointer-x");
             event.currentTarget.style.removeProperty("--pointer-y");
+            event.currentTarget.style.removeProperty("--wave-x");
+            event.currentTarget.style.removeProperty("--wave-y");
           }}
           onPointerMove={(event) => {
             const bounds = event.currentTarget.getBoundingClientRect();
+            const normalizedX = (event.clientX - bounds.left) / bounds.width;
+            const normalizedY = (event.clientY - bounds.top) / bounds.height;
             event.currentTarget.style.setProperty(
               "--pointer-x",
-              `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
+              `${normalizedX * 100}%`,
             );
             event.currentTarget.style.setProperty(
               "--pointer-y",
-              `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
+              `${normalizedY * 100}%`,
+            );
+            event.currentTarget.style.setProperty(
+              "--wave-x",
+              (normalizedX * 2 - 1).toFixed(3),
+            );
+            event.currentTarget.style.setProperty(
+              "--wave-y",
+              (normalizedY * 2 - 1).toFixed(3),
             );
           }}
         >
@@ -1312,8 +1173,8 @@ function Home() {
             className="hero-grid absolute inset-0 -z-20"
           />
           <div className="mx-auto max-w-360 px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
-            <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
-              <div className="lg:col-span-7">
+            <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
+              <div className="relative z-10 lg:col-span-7">
                 <p className="hero-item font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-signal">
                   Direction before distribution
                 </p>
@@ -1342,8 +1203,8 @@ function Home() {
                   </a>
                 </div>
               </div>
-              <div className="hero-item lg:col-span-5">
-                <SignalScene />
+              <div className="hero-wave-column hero-item lg:col-span-5">
+                <LiquidWaveHero />
               </div>
             </div>
           </div>
