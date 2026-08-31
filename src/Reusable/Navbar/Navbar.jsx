@@ -57,14 +57,14 @@ function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] backdrop-blur-xl">
+    <header className="site-header sticky top-0 z-50">
       <nav
         aria-label="Primary navigation"
-        className="mx-auto flex h-18 max-w-360 items-center justify-between px-5 sm:px-8 lg:px-12"
+        className="site-nav mx-auto flex max-w-360 items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"
       >
         <a
           aria-label="Audio 90 home"
-          className="flex items-center gap-3 text-xl font-semibold tracking-tight text-text"
+          className="nav-pill nav-brand flex items-center gap-3 text-lg font-semibold tracking-tight"
           href="#top"
           onClick={closeMenu}
         >
@@ -74,7 +74,7 @@ function Navbar() {
           </span>
         </a>
 
-        <div className="hidden items-center gap-9 lg:flex">
+        <div className="nav-pill hidden items-center gap-7 lg:flex">
           {navigation.map((item) => (
             <a
               aria-current={activeHref === item.href ? "location" : undefined}
@@ -89,7 +89,7 @@ function Navbar() {
 
         <div className="hidden lg:block">
           <a
-            className="inline-flex min-h-11 items-center justify-center bg-text px-5 text-sm font-semibold text-surface transition-transform duration-200 hover:-translate-y-0.5"
+            className="nav-cta inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold transition-transform duration-200 hover:-translate-y-0.5"
             href="#pilot"
           >
             Request an early test
@@ -100,7 +100,7 @@ function Navbar() {
           aria-controls="mobile-navigation"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Close navigation" : "Open navigation"}
-          className="grid size-11 place-items-center border border-border text-text transition-colors hover:border-text lg:hidden"
+          className="nav-pill grid size-11 place-items-center text-text transition-colors lg:hidden"
           onClick={() => setIsOpen((current) => !current)}
           type="button"
         >
@@ -129,7 +129,7 @@ function Navbar() {
 
       {isOpen && (
         <div
-          className="border-t border-border bg-bg px-5 py-5 lg:hidden"
+          className="nav-mobile mx-4 rounded-2xl px-4 py-4 shadow-2xl lg:hidden"
           id="mobile-navigation"
         >
           <div className="mx-auto flex max-w-360 flex-col gap-1">
@@ -145,7 +145,7 @@ function Navbar() {
               </a>
             ))}
             <a
-              className="mt-3 inline-flex min-h-12 items-center justify-center bg-text px-5 font-semibold text-surface"
+              className="nav-cta mt-3 inline-flex min-h-12 items-center justify-center px-5 font-semibold"
               href="#pilot"
               onClick={closeMenu}
             >

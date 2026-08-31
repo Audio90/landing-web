@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "../Reusable/Navbar/Navbar";
 
 const creativeA = [
@@ -30,185 +30,67 @@ function ArrowIcon() {
   );
 }
 
-const LazyLiquidShader = lazy(async () => {
-  const { ShaderGradient, ShaderGradientCanvas } = await import(
-    "@shadergradient/react"
-  );
-
-  function LiquidShader({ animate, compact, pixelDensity }) {
-    return (
-      <ShaderGradientCanvas
-        className="liquid-wave-canvas"
-        fov={43}
-        lazyLoad={false}
-        pixelDensity={pixelDensity}
-        pointerEvents="none"
-        powerPreference="high-performance"
-      >
-        <ShaderGradient
-          animate={animate ? "on" : "off"}
-          brightness={1.16}
-          cAzimuthAngle={180}
-          cPolarAngle={90}
-          cDistance={compact ? 4.1 : 3.6}
-          color1="#edf5e9"
-          color2="#145643"
-          color3="#b8e873"
-          control="props"
-          enableCameraUpdate={false}
-          enableTransition={false}
-          grain="off"
-          lightType="3d"
-          positionX={compact ? 0 : -0.12}
-          positionY={-0.08}
-          reflection={0.48}
-          rotationX={0}
-          rotationY={10}
-          rotationZ={compact ? 43 : 50}
-          shader="defaults"
-          type="plane"
-          uAmplitude={1}
-          uDensity={1.3}
-          uFrequency={5.5}
-          uSpeed={compact ? 0.045 : 0.07}
-          uStrength={4}
-          uTime={0}
-          wireframe={false}
-        />
-      </ShaderGradientCanvas>
-    );
-  }
-
-  return { default: LiquidShader };
-});
-
-function LiquidWavePoster() {
+function HeroSignalStudio() {
   return (
-    <div aria-hidden="true" className="liquid-wave-poster">
-      <span />
+    <div aria-hidden="true" className="hero-studio">
+      <div className="hero-studio-aura" />
+
+      <article className="hero-float-card hero-float-a">
+        <span className="hero-card-kicker">Creative A · 0:30</span>
+        <div className="hero-mini-wave">
+          {creativeA.slice(2, 16).map((height, index) => (
+            <span key={`${height}-${index}`} style={{ height: `${height * 0.42}px` }} />
+          ))}
+        </div>
+        <span className="hero-card-caption"><i className="hero-card-dot dot-coral" /> Full cut</span>
+      </article>
+
+      <article className="hero-float-card hero-float-b">
+        <span className="hero-card-kicker">Creative B · 0:15</span>
+        <div className="hero-mini-wave">
+          {creativeB.slice(2, 16).map((height, index) => (
+            <span key={`${height}-${index}`} style={{ height: `${height * 0.42}px` }} />
+          ))}
+        </div>
+        <span className="hero-card-caption"><i className="hero-card-dot dot-violet" /> Condensed cut</span>
+      </article>
+
+      <div className="hero-studio-core">
+        <p className="hero-command-copy">
+          Compare two audio ads against the audience and campaign context.
+        </p>
+        <div className="hero-command-actions">
+          <span className="hero-command-add">+</span>
+          <span className="hero-command-tag">@ Campaign brief</span>
+          <span className="hero-command-submit"><ArrowIcon /></span>
+        </div>
+      </div>
+
+      <article className="hero-float-card hero-float-metric">
+        <span className="hero-card-kicker">Directional result</span>
+        <p>Creative B leads</p>
+        <strong>67%</strong>
+        <span className="hero-card-caption">Medium confidence</span>
+      </article>
+
+      <div className="hero-studio-flow">
+        <span>✦ Compare creatives</span>
+        <span>▷ Model audience</span>
+        <span>▥ Measure result</span>
+      </div>
     </div>
   );
 }
 
-class LiquidWaveErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { failed: false };
-  }
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  render() {
-    if (this.state.failed) return <LiquidWavePoster />;
-    return this.props.children;
-  }
-}
-
-function LiquidWaveHero() {
-  const rootRef = useRef(null);
-  const [renderState, setRenderState] = useState({
-    animate: false,
-    compact: false,
-    pixelDensity: 1,
-    shouldRender: false,
-  });
-
-  useEffect(() => {
-    const root = rootRef.current;
-    const reducedMotionQuery = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    );
-    const compactQuery = window.matchMedia("(max-width: 640px)");
-    const connection = navigator.connection;
-    const saveData = Boolean(connection?.saveData);
-    const lowMemory = navigator.deviceMemory && navigator.deviceMemory < 4;
-    const testCanvas = document.createElement("canvas");
-    const supportsWebGL = Boolean(
-      testCanvas.getContext("webgl2", { failIfMajorPerformanceCaveat: true }) ||
-        testCanvas.getContext("webgl", { failIfMajorPerformanceCaveat: true }),
-    );
-    let isInView = false;
-
-    const updateState = () => {
-      const compact = compactQuery.matches;
-      setRenderState({
-        animate: !reducedMotionQuery.matches,
-        compact,
-        pixelDensity: Math.min(window.devicePixelRatio || 1, compact ? 1 : 1.25),
-        shouldRender:
-          isInView && !document.hidden && supportsWebGL && !saveData && !lowMemory,
-      });
-    };
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isInView = entry.isIntersecting;
-        updateState();
-      },
-      { rootMargin: "160px 0px", threshold: 0.01 },
-    );
-
-    observer.observe(root);
-    reducedMotionQuery.addEventListener("change", updateState);
-    compactQuery.addEventListener("change", updateState);
-    document.addEventListener("visibilitychange", updateState);
-    updateState();
-
-    return () => {
-      observer.disconnect();
-      reducedMotionQuery.removeEventListener("change", updateState);
-      compactQuery.removeEventListener("change", updateState);
-      document.removeEventListener("visibilitychange", updateState);
-    };
-  }, []);
-
+function SignalMarquee() {
+  const items = ["Compare", "Predict", "Explain", "Validate", "Learn"];
   return (
-    <div
-      aria-hidden="true"
-      className="liquid-wave-stage"
-      data-motion={renderState.animate ? "ambient" : "still"}
-      data-rendering={renderState.shouldRender ? "shader" : "poster"}
-      ref={rootRef}
-    >
-      <svg aria-hidden="true" className="liquid-wave-defs" focusable="false">
-        <defs>
-          <linearGradient id="liquid-wave-edge" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#f6fff0" stopOpacity=".78" />
-            <stop offset=".45" stopColor="#c9f57a" stopOpacity=".36" />
-            <stop offset="1" stopColor="#79b39b" stopOpacity=".08" />
-          </linearGradient>
-        </defs>
-      </svg>
-      <div className="liquid-wave-glow" />
-      <LiquidWaveErrorBoundary>
-        {renderState.shouldRender ? (
-          <Suspense fallback={<LiquidWavePoster />}>
-            <LazyLiquidShader
-              animate={renderState.animate}
-              compact={renderState.compact}
-              pixelDensity={renderState.pixelDensity}
-            />
-          </Suspense>
-        ) : (
-          <LiquidWavePoster />
-        )}
-      </LiquidWaveErrorBoundary>
-      <svg
-        aria-hidden="true"
-        className="liquid-wave-highlights"
-        focusable="false"
-        viewBox="0 0 1000 500"
-      >
-        <path
-          d="M35 305C125 65 305 70 430 235C550 395 645 395 760 225C850 95 925 90 995 175"
-          pathLength="1"
-        />
-        <path
-          d="M90 303C190 130 307 150 410 280C530 430 645 446 785 310C861 235 920 222 970 252"
-          pathLength="1"
-        />
-      </svg>
+    <div aria-label="Audio 90 workflow" className="signal-marquee">
+      <div className="signal-marquee-track">
+        {[...items, ...items].map((item, index) => (
+          <span key={`${item}-${index}`}><i /> {item}</span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -323,9 +205,9 @@ function AudioDemo() {
   const [isRevealed, setIsRevealed] = useState(false);
 
   return (
-    <section className="border-b border-border bg-surface" id="demo">
-      <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-        <div className="reveal grid gap-8 lg:grid-cols-12 lg:items-end">
+    <section className="story-section demo-section" id="demo">
+      <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
+        <div className="reveal story-heading grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-8">
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
               Try the product idea
@@ -340,8 +222,8 @@ function AudioDemo() {
           </p>
         </div>
 
-        <div className="reveal mt-12 grid overflow-hidden border border-text/20 bg-border lg:grid-cols-12">
-          <div className="space-y-3 bg-bg p-4 sm:p-7 lg:col-span-7">
+        <div className="demo-stage reveal mt-14 grid overflow-hidden lg:grid-cols-12">
+          <div className="demo-audio-pane space-y-3 p-4 sm:p-7 lg:col-span-7">
             <CreativeRow
               bars={creativeA}
               color="var(--warning)"
@@ -359,7 +241,7 @@ function AudioDemo() {
               src="/audio/great-texas-airshow-15s.mp3"
             />
           </div>
-          <div className="bg-surface p-6 sm:p-8 lg:col-span-5">
+          <div className="demo-choice-pane p-6 sm:p-8 lg:col-span-5">
             <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-muted">
               Your read
             </p>
@@ -953,9 +835,9 @@ function ProcessSection() {
   ];
 
   return (
-    <section className="border-b border-border bg-bg" id="process">
-      <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-        <div className="reveal grid gap-8 lg:grid-cols-12 lg:items-end">
+    <section className="story-section process-section" id="process">
+      <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
+        <div className="reveal story-heading grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-8">
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
               How it works
@@ -969,9 +851,9 @@ function ProcessSection() {
             few working days—not a months-long research cycle.
           </p>
         </div>
-        <div className="reveal mt-12 grid border-l border-t border-text/20 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="process-track reveal mt-14 grid sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(([number, title, detail]) => (
-            <article className="step-card min-h-60 border-b border-r border-text/20 bg-surface p-6" key={number}>
+            <article className="step-card min-h-64 p-6" key={number}>
               <p className="font-mono text-[9px] text-accent">{number}</p>
               <h3 className="mt-10 text-xl font-semibold">{title}</h3>
               <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
@@ -991,26 +873,26 @@ function MethodologySection() {
   ];
 
   return (
-    <section className="border-b border-border bg-bg" id="methodology">
-      <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-        <div className="reveal grid gap-8 lg:grid-cols-12 lg:items-end">
-          <div className="lg:col-span-8">
+    <section className="story-section methodology-section" id="methodology">
+      <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
+        <div className="reveal methodology-intro">
+          <div>
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-primary">
             Honest by design
             </p>
-            <h2 className="mt-5 max-w-220 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl">
+            <h2 className="methodology-statement mt-6 text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-balance sm:text-6xl lg:text-[5.4rem]">
               Useful direction without false certainty.
             </h2>
           </div>
-          <p className="max-w-125 text-base leading-7 text-muted lg:col-span-4">
+          <p className="mx-auto mt-8 max-w-150 text-center text-base leading-7 text-muted">
             Unreleased creative stays private, and retention terms are agreed
             before any pilot files are uploaded.
           </p>
         </div>
 
-        <div className="reveal mt-12 grid gap-px border border-border bg-border lg:grid-cols-3">
+        <div className="methodology-cards reveal mt-16 grid lg:grid-cols-3">
           {principles.map(([title, detail], index) => (
-            <article className="bg-surface p-6 sm:p-7" key={title}>
+            <article className="method-card p-6 sm:p-8" key={title}>
               <p className="font-mono text-[8px] text-accent">0{index + 1}</p>
               <h3 className="mt-7 text-xl font-semibold">{title}</h3>
               <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
@@ -1138,13 +1020,13 @@ function Home() {
       <Navbar />
       <main id="main-content">
         <section
-          className="relative isolate overflow-hidden border-b border-white/10 bg-hero text-white"
+          className="hero-v4 relative isolate overflow-hidden bg-hero text-white"
           id="product"
           onPointerLeave={(event) => {
             event.currentTarget.style.removeProperty("--pointer-x");
             event.currentTarget.style.removeProperty("--pointer-y");
-            event.currentTarget.style.removeProperty("--wave-x");
-            event.currentTarget.style.removeProperty("--wave-y");
+            event.currentTarget.style.removeProperty("--studio-x");
+            event.currentTarget.style.removeProperty("--studio-y");
           }}
           onPointerMove={(event) => {
             const bounds = event.currentTarget.getBoundingClientRect();
@@ -1159,62 +1041,61 @@ function Home() {
               `${normalizedY * 100}%`,
             );
             event.currentTarget.style.setProperty(
-              "--wave-x",
+              "--studio-x",
               (normalizedX * 2 - 1).toFixed(3),
             );
             event.currentTarget.style.setProperty(
-              "--wave-y",
+              "--studio-y",
               (normalizedY * 2 - 1).toFixed(3),
             );
           }}
         >
-          <div
-            aria-hidden="true"
-            className="hero-grid absolute inset-0 -z-20"
-          />
-          <div className="mx-auto max-w-360 px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
-            <div className="grid gap-8 lg:grid-cols-12 lg:items-center">
-              <div className="relative z-10 lg:col-span-7">
+          <div aria-hidden="true" className="hero-atmosphere absolute inset-0 -z-20" />
+          <div className="mx-auto max-w-360 px-5 pb-16 pt-14 sm:px-8 sm:pb-20 sm:pt-20 lg:px-12 lg:pb-24 lg:pt-24">
+            <div className="hero-copy mx-auto text-center">
+              <div className="relative z-10">
                 <p className="hero-item font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-signal">
                   Direction before distribution
                 </p>
-                <h1 className="hero-item mt-6 max-w-210 text-5xl font-semibold leading-[0.9] tracking-[-0.065em] text-balance sm:text-7xl lg:text-[5.65rem]">
+                <h1 className="hero-item mx-auto mt-6 max-w-275 text-5xl font-semibold leading-[0.88] tracking-[-0.072em] text-balance sm:text-7xl lg:text-[6.9rem]">
                   Hear the stronger idea
-                  <span className="hero-serif block font-normal italic text-signal">
+                  <span className="hero-serif block font-normal text-signal">
                     before the market does.
                   </span>
                 </h1>
-                <p className="hero-item mt-7 max-w-155 text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
+                <p className="hero-item mx-auto mt-7 max-w-165 text-base leading-7 text-white/65 sm:text-lg sm:leading-8">
                   Compare two audio ads. Get a directional winner, the reason,
                   and the uncertainty—in a few working days.
                 </p>
-                <div className="hero-item mt-8 flex flex-col gap-3 sm:flex-row">
+                <div className="hero-item mt-8 flex flex-col justify-center gap-3 sm:flex-row">
                   <a
-                    className="group inline-flex min-h-13 items-center justify-center gap-2 bg-signal px-6 text-sm font-semibold text-hero transition-transform hover:-translate-y-0.5"
+                    className="hero-primary-cta group inline-flex min-h-13 items-center justify-center gap-2 px-7 text-sm font-semibold transition-transform hover:-translate-y-0.5"
                     href="#pilot"
                   >
                     Request an early test <ArrowIcon />
                   </a>
                   <a
-                    className="inline-flex min-h-13 items-center justify-center border border-white/20 px-6 text-sm font-semibold text-white transition-colors hover:border-white/45 hover:bg-white/6"
+                    className="hero-secondary-cta inline-flex min-h-13 items-center justify-center px-7 text-sm font-semibold text-white transition-colors"
                     href="#demo"
                   >
                     Hear the A/B demo
                   </a>
                 </div>
               </div>
-              <div className="hero-wave-column hero-item lg:col-span-5">
-                <LiquidWaveHero />
-              </div>
+            </div>
+            <div className="hero-item hero-studio-wrap">
+              <HeroSignalStudio />
             </div>
           </div>
         </section>
 
+        <SignalMarquee />
+
         <AudioDemo />
 
-        <section className="report-section border-b border-border bg-bg" id="report">
-          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-            <div className="reveal mb-10 grid gap-6 lg:grid-cols-12 lg:items-end">
+        <section className="report-section story-section" id="report">
+          <div className="report-scene mx-auto max-w-375 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
+            <div className="reveal story-heading mb-12 grid gap-6 lg:grid-cols-12 lg:items-end">
               <div className="lg:col-span-8">
                 <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
                   Illustrative sample report
@@ -1228,7 +1109,9 @@ function Home() {
                 outcome below is illustrative sample data—not customer evidence.
               </p>
             </div>
-            <ExperimentDashboard />
+            <div className="report-stage reveal">
+              <ExperimentDashboard />
+            </div>
             <div className="report-value-strip reveal grid sm:grid-cols-3">
               {[
                 ["01", "Direction", "Know which creative to test first."],
@@ -1251,9 +1134,9 @@ function Home() {
 
         <MethodologySection />
 
-        <section className="bg-surface" id="pilot">
-          <div className="mx-auto max-w-360 px-5 py-20 sm:px-8 sm:py-24 lg:px-12">
-            <div className="reveal grid gap-10 border-y border-text/20 py-12 lg:grid-cols-12 lg:py-16">
+        <section className="pilot-section" id="pilot">
+          <div className="mx-auto max-w-360 px-5 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
+            <div className="pilot-panel reveal grid gap-10 p-7 sm:p-10 lg:grid-cols-12 lg:p-14">
               <div className="lg:col-span-6">
                 <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">
                   Limited early pilot
@@ -1267,7 +1150,7 @@ function Home() {
                   it leads, and where the result remains uncertain.
                 </p>
               </div>
-              <div className="lg:col-span-6"><PilotForm /></div>
+              <div className="pilot-form-shell lg:col-span-6"><PilotForm /></div>
             </div>
           </div>
         </section>
